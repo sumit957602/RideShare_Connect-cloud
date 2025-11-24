@@ -66,7 +66,7 @@ namespace RideShare_Connect.Controllers
                 Profile = profile
             };
 
-            ViewBag.RazorpayKey = _config["PaymentGateway:ApiKey"] ?? "rzp_test_R5NMyugFaCywDS";
+            ViewBag.RazorpayKey = _config["PaymentGateway:ApiKey"];
 
             return View(model);
         }
