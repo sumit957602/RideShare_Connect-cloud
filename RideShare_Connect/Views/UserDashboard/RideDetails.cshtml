@@ -1,0 +1,159 @@
+@model RideShare_Connect.ViewModels.RideDetailsViewModel
+@{
+    ViewData["Title"] = "Ride Details";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Details - RideShare Connect</title>
+
+   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+   
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="~/css/userRideDetails.css" asp-append-version="true" />
+
+</head>
+<body>
+
+    <!-- Header & Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="/Home">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content: Ride Details -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <div class="card">
+                <div class="form-card-header text-center">
+                    <h2 class="mb-0">Ride Details</h2>
+                    <p class="mb-0">Review the ride information below.</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <p><strong>Origin:</strong> @Model.Ride.Origin</p>
+                            <p><strong>Destination:</strong> @Model.Ride.Destination</p>
+                            <p><strong>Departure Time:</strong> @Model.Ride.DepartureTime.ToString("g")</p>
+                            <p><strong>Price per Seat:</strong> ₹@Model.Ride.PricePerSeat</p>
+                            <p><strong>Seats Available:</strong> @Model.Ride.AvailableSeats</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Driver:</strong> @Model.Ride.Driver?.FullName</p>
+                            <p><strong>Vehicle:</strong> @Model.Ride.Vehicle?.Model (@Model.Ride.Vehicle?.LicensePlate)</p>
+                        </div>
+                    </div>
+
+                    <div id="map" class="mt-4"></div>
+
+                    <hr />
+
+                    <h5>Riders</h5>
+                    <ul class="list-group">
+                        @if (Model.Riders.Any())
+                        {
+                            foreach (var rider in Model.Riders)
+                            {
+                                <li class="list-group-item">@rider</li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="list-group-item">No riders for this ride.</li>
+                        }
+                    </ul>
+
+                    <div class="mt-4">
+                        <a asp-action="User" class="btn btn-secondary">Back to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Leaflet JS for Map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Map Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const map = L.map('map').setView([25.5941, 85.1376], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const origin = @System.Text.Json.JsonSerializer.Serialize(Model.Ride.Origin);
+            const destination = @System.Text.Json.JsonSerializer.Serialize(Model.Ride.Destination);
+
+            async function geocode(query) {
+                if (!query) return null;
+                const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+                try {
+                    const response = await fetch(url);
+                    const results = await response.json();
+                    if (results.length > 0) {
+                        return [parseFloat(results[0].lat), parseFloat(results[0].lon)];
+                    }
+                } catch (err) {
+                    console.error('Geocoding error:', err);
+                }
+                return null;
+            }
+
+            async function drawRoute(originCoords, destCoords) {
+                const url = `https://router.project-osrm.org/route/v1/driving/${originCoords[1]},${originCoords[0]};${destCoords[1]},${destCoords[0]}?overview=full&geometries=geojson`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+                    L.polyline(coords, { color: 'var(--primary-color)' }).addTo(map);
+                    map.fitBounds(coords);
+                }
+            }
+
+            async function initMap() {
+                const originCoords = await geocode(origin);
+                const destCoords = await geocode(destination);
+
+                if (originCoords) {
+                    L.marker(originCoords).addTo(map).bindPopup(`<b>Origin:</b> ${origin}`);
+                }
+                if (destCoords) {
+                    L.marker(destCoords).addTo(map).bindPopup(`<b>Destination:</b> ${destination}`);
+                }
+
+                if (originCoords && destCoords) {
+                    await drawRoute(originCoords, destCoords);
+                } else if (originCoords) {
+                    map.setView(originCoords, 13);
+                } else if (destCoords) {
+                    map.setView(destCoords, 13);
+                }
+            }
+
+            initMap();
+        });
+    </script>
+
+</body>
+</html>
+
