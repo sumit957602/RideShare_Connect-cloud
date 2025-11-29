@@ -237,111 +237,150 @@ namespace RideShare_Connect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BookRide(int id, [FromBody] RideBookingRequestDto dto)
         {
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            try
             {
-                return Unauthorized();
-            }
-
-            // Direct DB Logic (Transaction)
-             await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-
-            try {
-                var ride = await _db.Rides.FirstOrDefaultAsync(r => r.Id == id);
-                if (ride == null) return NotFound("Ride not found");
-
-                if (ride.Status != "Scheduled") return BadRequest("ride closed");
-                if (ride.DepartureTime <= DateTime.UtcNow) return BadRequest("ride past");
-                if (ride.AvailableSeats < dto.NumPersons) return BadRequest("not enough seats");
-                if (!new[] { "Wallet", "Razor Pay", "Cash" }.Contains(dto.PaymentMode)) return BadRequest("invalid payment mode");
-
-                ride.AvailableSeats -= dto.NumPersons;
-
-                var booking = new RideBooking
+                System.IO.File.AppendAllText("debug_log.txt", $"\n[{DateTime.Now}] BookRide called. ID: {id}");
+                
+                var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
                 {
-                    RideId = id,
-                    PassengerId = userId,
-                    BookedSeats = dto.NumPersons,
-                    PickupLocation = dto.PickupLocation,
-                    DropLocation = dto.DropLocation,
-                    DistanceKm = dto.DistanceKm,
-                    BookingTime = DateTime.UtcNow,
-                    Status = "Pending"
-                };
-                _db.RideBookings.Add(booking);
+                    System.IO.File.AppendAllText("debug_log.txt", " - Unauthorized: User ID not found.");
+                    return Unauthorized();
+                }
 
-                var totalFare = ride.PricePerSeat * dto.NumPersons * dto.DistanceKm;
-
-                if (dto.PaymentMode == "Wallet")
+                if (dto == null)
                 {
-                    var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
-                    if (wallet == null || wallet.Balance < totalFare)
+                    System.IO.File.AppendAllText("debug_log.txt", " - BadRequest: DTO is null.");
+                    return BadRequest("Invalid booking request.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    var errors = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                    System.IO.File.AppendAllText("debug_log.txt", $" - Validation Failed: {errors}");
+                    return BadRequest($"Validation failed: {errors}");
+                }
+
+                System.IO.File.AppendAllText("debug_log.txt", " - Starting Transaction.");
+
+                // Direct DB Logic (Transaction)
+                await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+                try
+                {
+                    var ride = await _db.Rides.FirstOrDefaultAsync(r => r.Id == id);
+                    if (ride == null) 
                     {
-                        await transaction.RollbackAsync();
-                        return BadRequest("You have not sufficient balance in your wallet");
+                        System.IO.File.AppendAllText("debug_log.txt", " - Ride not found.");
+                        return NotFound("Ride not found.");
                     }
 
-                    wallet.Balance -= totalFare;
-                    wallet.LastUpdated = DateTime.UtcNow;
-                    _db.WalletTransactions.Add(new WalletTransaction
+                    if (ride.AvailableSeats < dto.NumPersons)
                     {
-                        Wallet = wallet,
-                        Amount = totalFare,
-                        TxnType = "Debit",
-                        TxnDate = DateTime.UtcNow,
-                        Description = "Ride booking",
-                        TransactionId = Guid.NewGuid().ToString(),
-                        PaymentMethod = "Wallet",
-                        Status = "Completed"
-                    });
-                }
+                        System.IO.File.AppendAllText("debug_log.txt", " - Not enough seats.");
+                        return BadRequest("Not enough seats available.");
+                    }
 
-                var payment = new Payment
-                {
-                    UserId = userId,
-                    Booking = booking,
-                    Amount = totalFare,
-                    //PaymentMode = dto.PaymentMode,
-                    PaymentDate = DateTime.UtcNow,
-                    Status = dto.PaymentMode == "Wallet" ? "Completed" : "Pending"
-                };
-                _db.Payments.Add(payment);
+                    // Calculate Fare
+                    var totalFare = ride.PricePerSeat * dto.NumPersons;
 
-                var transactionSummary = await _db.UserTransactionSummaries
-                    .OrderByDescending(t => t.TransactionId)
-                    .FirstOrDefaultAsync(t => t.UserId == userId);
-
-                if (transactionSummary == null)
-                {
-                    transactionSummary = new UserTransactionSummary
+                    // Payment Logic
+                    if (dto.PaymentMode == "Wallet")
                     {
-                        RideId = ride.Id,
-                        DriverId = ride.DriverId,
-                        UserId = userId,
-                        TotalAmount = totalFare,
-                        TotalTransactionAmount = dto.PaymentMode == "Cash" ? 0 : totalFare,
+                        var userWallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+                        if (userWallet == null || userWallet.Balance < totalFare)
+                        {
+                            System.IO.File.AppendAllText("debug_log.txt", " - Insufficient wallet balance.");
+                            return BadRequest("Insufficient wallet balance.");
+                        }
+                        userWallet.Balance -= totalFare;
+                        _db.Wallets.Update(userWallet);
+                        
+                        _db.WalletTransactions.Add(new WalletTransaction
+                        {
+                            Wallet = userWallet,
+                            Amount = totalFare,
+                            TxnType = "Debit",
+                            TxnDate = DateTime.UtcNow,
+                            Description = "Ride booking",
+                            TransactionId = Guid.NewGuid().ToString(),
+                            PaymentMethod = "Wallet",
+                            Status = "Completed"
+                        });
+                    }
+
+                    // Create Booking
+                    var booking = new RideBooking
+                    {
+                        RideId = id,
+                        PassengerId = userId,
+                        BookedSeats = dto.NumPersons,
+                        PickupLocation = dto.PickupLocation,
+                        DropLocation = dto.DropLocation,
+                        DistanceKm = dto.DistanceKm,
+                        BookingTime = DateTime.UtcNow,
+                        Status = "Pending"
                     };
-                    _db.UserTransactionSummaries.Add(transactionSummary);
+
+                    _db.RideBookings.Add(booking);
+                    ride.AvailableSeats -= dto.NumPersons;
+                    _db.Rides.Update(ride);
+                    
+                    // Create Payment Record
+                    var payment = new Payment
+                    {
+                        UserId = userId,
+                        Booking = booking,
+                        Amount = totalFare,
+                        PaymentMode = dto.PaymentMode,
+                        PaymentDate = DateTime.UtcNow,
+                        Status = dto.PaymentMode == "Wallet" ? "Completed" : "Pending"
+                    };
+                    _db.Payments.Add(payment);
+
+                    // Update Transaction Summary
+                    var transactionSummary = await _db.UserTransactionSummaries
+                        .OrderByDescending(t => t.TransactionId)
+                        .FirstOrDefaultAsync(t => t.UserId == userId);
+
+                    if (transactionSummary == null)
+                    {
+                        transactionSummary = new UserTransactionSummary
+                        {
+                            RideId = ride.Id,
+                            DriverId = ride.DriverId,
+                            UserId = userId,
+                            TotalAmount = totalFare,
+                            TotalTransactionAmount = dto.PaymentMode == "Cash" ? 0 : totalFare,
+                        };
+                        _db.UserTransactionSummaries.Add(transactionSummary);
+                    }
+                    else
+                    {
+                        transactionSummary.RideId = ride.Id;
+                        transactionSummary.DriverId = ride.DriverId;
+                        transactionSummary.TotalAmount += totalFare;
+                        if (dto.PaymentMode != "Cash")
+                            transactionSummary.TotalTransactionAmount += totalFare;
+                    }
+
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    
+                    System.IO.File.AppendAllText("debug_log.txt", " - Success.");
+                    return Ok(new { message = "Ride booked successfully!", bookingId = booking.Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    transactionSummary.RideId = ride.Id;
-                    transactionSummary.DriverId = ride.DriverId;
-                    transactionSummary.TotalAmount += totalFare;
-                    if (dto.PaymentMode != "Cash")
-                        transactionSummary.TotalTransactionAmount += totalFare;
+                    await transaction.RollbackAsync();
+                    System.IO.File.AppendAllText("debug_log.txt", $" - Transaction Error: {ex}");
+                    throw;
                 }
-
-                await _db.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                return Ok(new { bookingId = booking.Id, paymentId = payment.Id, paymentStatus = payment.Status, totalFare });
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Error booking ride");
-                return StatusCode(500, "Internal server error");
+                System.IO.File.AppendAllText("debug_log.txt", $" - Outer Error: {ex}");
+                return StatusCode(500, ex.Message);
             }
         }
     }
