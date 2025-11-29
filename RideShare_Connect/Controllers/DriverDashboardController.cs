@@ -7,9 +7,6 @@ using RideShare_Connect.Models.VehicleManagement;
 using RideShare_Connect.ViewModels;
 using RideShare_Connect.DTOs;
 using RideShare_Connect.Models.PaymentManagement;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 
@@ -17,14 +14,12 @@ namespace RideShare_Connect.Controllers
 {
     public class DriverDashboardController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly ApplicationDbContext _db;
         private readonly ILogger<DriverDashboardController> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
 
-        public DriverDashboardController(AppDbContext db, IHttpClientFactory httpClientFactory, ILogger<DriverDashboardController> logger)
+        public DriverDashboardController(ApplicationDbContext db, ILogger<DriverDashboardController> logger)
         {
             _db = db;
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
@@ -37,7 +32,7 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("Login", "DriverAccount");
             }
 
-            var driver = await _db.Set<Driver>()
+            var driver = await _db.Driver
                 .Include(d => d.DriverProfile)
                 .FirstOrDefaultAsync(d => d.DriverId == userId);
             var driverProfile = driver?.DriverProfile;
@@ -486,35 +481,21 @@ namespace RideShare_Connect.Controllers
 
             try
             {
-                var httpClient = _httpClientFactory.CreateClient("RideShareApi");
-                var dto = new VehicleRegisterDto
+                var vehicle = new Vehicle
                 {
+                    DriverId = userId,
                     CarMaker = model.CarMaker,
-                    CarModel = model.CarModel,
+                    Model = model.CarModel,
                     VehicleType = model.VehicleType,
                     LicensePlate = model.LicensePlate,
+                    VerificationStatus = "Pending",
                     Year = model.Year
                 };
 
-                var response = await httpClient.PostAsJsonAsync($"api/Vehicles/register?driverId={userId}", dto);
-                if (response.IsSuccessStatusCode)
-                {
-                    return RedirectToAction(nameof(Driver));
-                }
+                _db.Vehicles.Add(vehicle);
+                await _db.SaveChangesAsync();
 
-                string? apiError;
-                try
-                {
-                    var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-                    apiError = problem?.Detail ?? problem?.Title;
-                }
-                catch (Exception)
-                {
-                    apiError = await response.Content.ReadAsStringAsync();
-                }
-
-                _logger.LogError("Failed to register vehicle: {Error}", apiError);
-                ModelState.AddModelError(string.Empty, string.IsNullOrWhiteSpace(apiError) ? "Failed to register vehicle." : apiError);
+                return RedirectToAction(nameof(Driver));
             }
             catch (Exception ex)
             {
@@ -620,7 +601,7 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("Login", "DriverAccount");
             }
 
-            var driver = await _db.Set<Driver>()
+            var driver = await _db.Driver
                 .Include(d => d.DriverProfile)
                 .FirstOrDefaultAsync(d => d.DriverId == userId);
             if (driver == null)
@@ -664,7 +645,7 @@ namespace RideShare_Connect.Controllers
                 return View(model);
             }
 
-            var driver = await _db.Set<Driver>()
+            var driver = await _db.Driver
                 .Include(d => d.DriverProfile)
                 .FirstOrDefaultAsync(d => d.DriverId == userId);
             if (driver == null)

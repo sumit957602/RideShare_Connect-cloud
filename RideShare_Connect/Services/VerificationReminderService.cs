@@ -24,7 +24,7 @@ namespace RideShare_Connect.Services
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     var soonExpiring = await context.UserVerifications
                         .Where(v => v.Status == "Approved" && v.ExpiresOn <= DateTime.UtcNow.AddDays(30))
                         .ToListAsync(stoppingToken);

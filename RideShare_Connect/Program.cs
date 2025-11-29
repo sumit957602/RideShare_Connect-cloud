@@ -4,17 +4,18 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using RideShare_Connect.Services;
+using Microsoft.AspNetCore.Identity;
+using RideShare_Connect.Models.UserManagement;
+using RideShare_Connect.Models.VehicleManagement;
+using RideShare_Connect.Models.AdminManagement;
+using RideShare_Connect.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddHttpClient("RideShareApi", client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7038/");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
+// HttpClient removed as we are moving to monolithic architecture
 
 builder.Services.AddAuthentication(options =>
 {
@@ -47,7 +48,8 @@ builder.Services.AddSession(options =>
 });
 
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -55,6 +57,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddHostedService<VerificationReminderService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IPasswordHasher<Driver>, PasswordHasher<Driver>>();
+builder.Services.AddScoped<IPasswordHasher<Admin>, PasswordHasher<Admin>>();
+
+builder.Services.Configure<PaymentGatewayOptions>(builder.Configuration.GetSection("PaymentGateway"));
+builder.Services.AddScoped<IPaymentGateway, PaymentGateway>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 var app = builder.Build();
 

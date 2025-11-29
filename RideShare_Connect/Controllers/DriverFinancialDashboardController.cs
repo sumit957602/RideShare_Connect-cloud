@@ -17,10 +17,10 @@ namespace RideShare_Connect.Controllers
     [Authorize(Roles = "Driver")]
     public class DriverFinancialDashboardController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly ApplicationDbContext _db;
         private readonly IConfiguration _config;
 
-        public DriverFinancialDashboardController(AppDbContext db, IConfiguration config)
+        public DriverFinancialDashboardController(ApplicationDbContext db, IConfiguration config)
         {
             _db = db;
             _config = config;
@@ -35,7 +35,7 @@ namespace RideShare_Connect.Controllers
             }
             var driverId = int.Parse(driverIdClaim);
 
-            var driver = await _db.Set<Driver>()
+            var driver = await _db.Driver
                 .Include(d => d.DriverProfile)
                 .FirstOrDefaultAsync(d => d.DriverId == driverId);
 

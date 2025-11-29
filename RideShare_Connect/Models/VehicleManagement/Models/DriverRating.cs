@@ -22,7 +22,7 @@ namespace RideShare_Connect.Models.VehicleManagement
         public int Rating { get; set; }
 
         [StringLength(1000)]
-        public string Review { get; set; }
+        public string? Review { get; set; }
 
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 

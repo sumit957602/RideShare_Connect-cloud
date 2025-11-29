@@ -12,9 +12,9 @@ namespace RideShare_Connect.Controllers
     [Route("api/[controller]")]
     public class VerificationController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public VerificationController(AppDbContext context)
+        public VerificationController(ApplicationDbContext context)
         {
             _context = context;
         }

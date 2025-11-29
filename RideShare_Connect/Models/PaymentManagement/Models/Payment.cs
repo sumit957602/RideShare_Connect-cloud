@@ -24,6 +24,10 @@ namespace RideShare_Connect.Models.PaymentManagement
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
+        [Required]
+        [StringLength(50)]
+        public string PaymentMode { get; set; }
+
         [ForeignKey("PaymentMethod")]
         public int? PaymentMethodId { get; set; }
 

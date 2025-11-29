@@ -15,9 +15,9 @@ namespace RideShare_Connect.Controllers
     [Authorize]
     public class FinancialDashboardController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly ApplicationDbContext _db;
         private readonly IConfiguration _config;
-        public FinancialDashboardController(AppDbContext db, IConfiguration config)
+        public FinancialDashboardController(ApplicationDbContext db, IConfiguration config)
         {
             _db = db;
             _config = config;

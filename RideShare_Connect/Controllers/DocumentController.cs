@@ -15,10 +15,10 @@ namespace RideShare_Connect.Controllers
     [Route("api/[controller]")]
     public class DocumentController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        public DocumentController(AppDbContext context, IWebHostEnvironment environment)
+        public DocumentController(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;

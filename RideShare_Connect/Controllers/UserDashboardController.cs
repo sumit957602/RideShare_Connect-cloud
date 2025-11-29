@@ -6,25 +6,23 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Security.Claims;
 using RideShare_Connect.DTOs;
-using System.Net.Http;
-using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using RideShare_Connect.Models.RideManagement;
+using RideShare_Connect.Models.PaymentManagement;
+using System.Data;
 
 namespace RideShare_Connect.Controllers
 {
     public class UserDashboardController : Controller
     {
-        private readonly AppDbContext _db;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ApplicationDbContext _db;
         private readonly ILogger<UserDashboardController> _logger;
         private readonly IConfiguration _config;
 
-        public UserDashboardController(AppDbContext db, IHttpClientFactory httpClientFactory, ILogger<UserDashboardController> logger, IConfiguration config)
+        public UserDashboardController(ApplicationDbContext db, ILogger<UserDashboardController> logger, IConfiguration config)
         {
             _db = db;
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
             _config = config;
         }
@@ -114,24 +112,27 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("Login", "UserAccount");
             }
 
-            var httpClient = _httpClientFactory.CreateClient("RideShareApi");
-            try
-            {
-                var response = await httpClient.GetAsync($"api/Users/profile?userId={userId}");
-                if (response.IsSuccessStatusCode)
-                {
-                    var userProfile = await response.Content.ReadFromJsonAsync<UserProfileDto>();
-                    return View(userProfile);
-                }
+            var user = await _db.Users
+                                    .Include(u => u.UserProfile)
+                                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-                _logger.LogError("Failed to fetch profile for user {UserId}: {StatusCode}", userId, response.StatusCode);
-            }
-            catch (HttpRequestException ex)
+            if (user?.UserProfile == null)
             {
-                _logger.LogError(ex, "Error fetching profile for user {UserId}", userId);
+                return View(new UserProfileDto());
             }
 
-            return View(new UserProfileDto());
+            var profileDto = new UserProfileDto
+            {
+                Id = user.UserProfile.Id,
+                UserId = user.UserProfile.UserId,
+                FullName = user.UserProfile.FullName,
+                ProfilePicture = user.UserProfile.ProfilePicture,
+                EmergencyContact = user.UserProfile.EmergencyContact,
+                Bio = user.UserProfile.Bio,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return View(profileDto);
         }
 
         [HttpPost]
@@ -144,56 +145,26 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("Login", "UserAccount");
             }
 
-            var updateDto = new UserProfileUpdateDto
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
             {
-                FullName = profile.FullName,
-                ProfilePicture = profile.ProfilePicture,
-                EmergencyContact = profile.EmergencyContact,
-                Bio = profile.Bio,
-                PhoneNumber = profile.PhoneNumber
-            };
-
-            var httpClient = _httpClientFactory.CreateClient("RideShareApi");
-            try
-            {
-                var response = await httpClient.PutAsJsonAsync($"api/Users/profile?userId={userId}", updateDto);
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError("Error updating profile for user {UserId}: {StatusCode} - {Error}", userId, response.StatusCode, errorContent);
-
-                    try
-                    {
-                        var problemDetails = JsonSerializer.Deserialize<ValidationProblemDetails>(errorContent);
-                        if (problemDetails?.Errors != null)
-                        {
-                            foreach (var key in problemDetails.Errors.Keys)
-                            {
-                                foreach (var error in problemDetails.Errors[key])
-                                {
-                                    ModelState.AddModelError(key, error);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, errorContent);
-                        }
-                    }
-                    catch (JsonException)
-                    {
-                        ModelState.AddModelError(string.Empty, errorContent);
-                    }
-
-                    return View(profile);
-                }
+                return NotFound();
             }
-            catch (HttpRequestException ex)
+
+            var userProfile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (userProfile == null)
             {
-                _logger.LogError(ex, "HTTP request error while updating profile for user {UserId}", userId);
-                ModelState.AddModelError(string.Empty, "An error occurred while updating profile.");
-                return View(profile);
+                userProfile = new UserProfile { UserId = userId };
+                _db.UserProfiles.Add(userProfile);
             }
+
+            if (profile.FullName != null) userProfile.FullName = profile.FullName;
+            if (profile.ProfilePicture != null) userProfile.ProfilePicture = profile.ProfilePicture;
+            if (profile.EmergencyContact != null) userProfile.EmergencyContact = profile.EmergencyContact;
+            if (profile.Bio != null) userProfile.Bio = profile.Bio;
+            if (profile.PhoneNumber != null) user.PhoneNumber = profile.PhoneNumber;
+
+            await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(UserProfile));
         }
@@ -261,6 +232,7 @@ namespace RideShare_Connect.Controllers
             ViewBag.RazorpayKey = _config["PaymentGateway:ApiKey"] ?? "rzp_test_R5NMyugFaCywDS";
             return View(ride);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BookRide(int id, [FromBody] RideBookingRequestDto dto)
@@ -271,26 +243,106 @@ namespace RideShare_Connect.Controllers
                 return Unauthorized();
             }
 
-            var httpClient = _httpClientFactory.CreateClient("RideShareApi");
-            var requestDto = new RideBookingRequestDto
-            {
-                RideId = id,
-                UserId = userId,
-                NumPersons = dto.NumPersons,
-                PaymentMode = dto.PaymentMode,
-                PickupLocation = dto.PickupLocation,
-                DropLocation = dto.DropLocation,
-                DistanceKm = dto.DistanceKm
-            };
+            // Direct DB Logic (Transaction)
+             await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
-            var response = await httpClient.PostAsJsonAsync("api/RideBookings/accept", requestDto);
-            var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-            {
-                return Content(content, "application/json");
+            try {
+                var ride = await _db.Rides.FirstOrDefaultAsync(r => r.Id == id);
+                if (ride == null) return NotFound("Ride not found");
+
+                if (ride.Status != "Scheduled") return BadRequest("ride closed");
+                if (ride.DepartureTime <= DateTime.UtcNow) return BadRequest("ride past");
+                if (ride.AvailableSeats < dto.NumPersons) return BadRequest("not enough seats");
+                if (!new[] { "Wallet", "Razor Pay", "Cash" }.Contains(dto.PaymentMode)) return BadRequest("invalid payment mode");
+
+                ride.AvailableSeats -= dto.NumPersons;
+
+                var booking = new RideBooking
+                {
+                    RideId = id,
+                    PassengerId = userId,
+                    BookedSeats = dto.NumPersons,
+                    PickupLocation = dto.PickupLocation,
+                    DropLocation = dto.DropLocation,
+                    DistanceKm = dto.DistanceKm,
+                    BookingTime = DateTime.UtcNow,
+                    Status = "Pending"
+                };
+                _db.RideBookings.Add(booking);
+
+                var totalFare = ride.PricePerSeat * dto.NumPersons * dto.DistanceKm;
+
+                if (dto.PaymentMode == "Wallet")
+                {
+                    var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+                    if (wallet == null || wallet.Balance < totalFare)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest("You have not sufficient balance in your wallet");
+                    }
+
+                    wallet.Balance -= totalFare;
+                    wallet.LastUpdated = DateTime.UtcNow;
+                    _db.WalletTransactions.Add(new WalletTransaction
+                    {
+                        Wallet = wallet,
+                        Amount = totalFare,
+                        TxnType = "Debit",
+                        TxnDate = DateTime.UtcNow,
+                        Description = "Ride booking",
+                        TransactionId = Guid.NewGuid().ToString(),
+                        PaymentMethod = "Wallet",
+                        Status = "Completed"
+                    });
+                }
+
+                var payment = new Payment
+                {
+                    UserId = userId,
+                    Booking = booking,
+                    Amount = totalFare,
+                    //PaymentMode = dto.PaymentMode,
+                    PaymentDate = DateTime.UtcNow,
+                    Status = dto.PaymentMode == "Wallet" ? "Completed" : "Pending"
+                };
+                _db.Payments.Add(payment);
+
+                var transactionSummary = await _db.UserTransactionSummaries
+                    .OrderByDescending(t => t.TransactionId)
+                    .FirstOrDefaultAsync(t => t.UserId == userId);
+
+                if (transactionSummary == null)
+                {
+                    transactionSummary = new UserTransactionSummary
+                    {
+                        RideId = ride.Id,
+                        DriverId = ride.DriverId,
+                        UserId = userId,
+                        TotalAmount = totalFare,
+                        TotalTransactionAmount = dto.PaymentMode == "Cash" ? 0 : totalFare,
+                    };
+                    _db.UserTransactionSummaries.Add(transactionSummary);
+                }
+                else
+                {
+                    transactionSummary.RideId = ride.Id;
+                    transactionSummary.DriverId = ride.DriverId;
+                    transactionSummary.TotalAmount += totalFare;
+                    if (dto.PaymentMode != "Cash")
+                        transactionSummary.TotalTransactionAmount += totalFare;
+                }
+
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok(new { bookingId = booking.Id, paymentId = payment.Id, paymentStatus = payment.Status, totalFare });
             }
-
-            return StatusCode((int)response.StatusCode, content);
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error booking ride");
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 }

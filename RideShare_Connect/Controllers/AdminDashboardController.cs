@@ -5,13 +5,17 @@ using RideShare_Connect.Models.VehicleManagement;
 using RideShare_Connect.ViewModels;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using RideShare_Connect.Models.UserManagement;
+using RideShare_Connect.Models.AdminManagement;
+using RideShare_Connect.DTOs;
+using RideShare_Connect.Models.RideManagement;
 
 namespace RideShare_Connect.Controllers
 {
     public class AdminDashboardController : Controller
     {
-        private readonly AppDbContext _db;
-        public AdminDashboardController(AppDbContext db)
+        private readonly ApplicationDbContext _db;
+        public AdminDashboardController(ApplicationDbContext db)
         {
             _db = db;
         }
@@ -31,7 +35,7 @@ namespace RideShare_Connect.Controllers
                 RidesCompleted = _db.Rides.Count(r => r.Status == "Completed"),
                 OpenReports = _db.UserReports.Count(r => r.Status == "Pending"),
                 Users = _db.Users.Include(u => u.UserProfile).ToList(),
-                Drivers = _db.Set<Driver>().ToList(),
+                Drivers = _db.Driver.Include(d => d.DriverProfile).ToList(),
                 Vehicles = _db.Vehicles.Include(v => v.Driver).ToList(),
                 Rides = _db.Rides.Include(r => r.Driver).ToList(),
                 RideBookings = _db.RideBookings
@@ -101,7 +105,7 @@ namespace RideShare_Connect.Controllers
             }
             else if (!string.IsNullOrWhiteSpace(model.FullName))
             {
-                user.UserProfile = new RideShare_Connect.Models.UserManagement.UserProfile
+                user.UserProfile = new UserProfile
                 {
                     FullName = model.FullName,
                     UserId = user.Id
@@ -149,7 +153,7 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("AdminLogin", "AdminAccount");
             }
 
-            var driver = await _db.Set<Driver>().Include(d => d.DriverProfile)
+            var driver = await _db.Driver.Include(d => d.DriverProfile)
                                 .FirstOrDefaultAsync(d => d.DriverId == id);
             if (driver == null)
             {
@@ -186,7 +190,7 @@ namespace RideShare_Connect.Controllers
                 return View(model);
             }
 
-            var driver = await _db.Set<Driver>().Include(d => d.DriverProfile)
+            var driver = await _db.Driver.Include(d => d.DriverProfile)
                                 .FirstOrDefaultAsync(d => d.DriverId == model.DriverId);
             if (driver == null)
             {
@@ -231,7 +235,7 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("AdminLogin", "AdminAccount");
             }
 
-            var driver = await _db.Set<Driver>().Include(d => d.DriverProfile)
+            var driver = await _db.Driver.Include(d => d.DriverProfile)
                                  .FirstOrDefaultAsync(d => d.DriverId == id);
             if (driver == null)
             {
@@ -249,7 +253,7 @@ namespace RideShare_Connect.Controllers
                 _db.DriverProfiles.Remove(driver.DriverProfile);
             }
 
-            _db.Set<Driver>().Remove(driver);
+            _db.Driver.Remove(driver);
             await _db.SaveChangesAsync();
 
             return RedirectToAction("Admin");
