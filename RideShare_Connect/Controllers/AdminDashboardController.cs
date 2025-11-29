@@ -291,7 +291,7 @@ namespace RideShare_Connect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditVehicle(EditVehicleViewModel model)
+        public async Task<IActionResult> EditVehicle(EditVehicleViewModel viewModel)
         {
             var role = User.FindFirstValue(ClaimTypes.Role);
             if (!User.Identity.IsAuthenticated || role != "Admin")
@@ -301,22 +301,22 @@ namespace RideShare_Connect.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewModel);
             }
 
-            var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == model.Id);
+            var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == viewModel.Id);
             if (vehicle == null)
             {
                 return NotFound();
             }
 
-            vehicle.DriverId = model.DriverId;
-            vehicle.CarMaker = model.CarMaker;
-            vehicle.Model = model.Model;
-            vehicle.VehicleType = model.VehicleType;
-            vehicle.LicensePlate = model.LicensePlate;
-            vehicle.VerificationStatus = model.VerificationStatus;
-            vehicle.Year = model.Year;
+            vehicle.DriverId = viewModel.DriverId;
+            vehicle.CarMaker = viewModel.CarMaker;
+            vehicle.Model = viewModel.Model;
+            vehicle.VehicleType = viewModel.VehicleType;
+            vehicle.LicensePlate = viewModel.LicensePlate;
+            vehicle.VerificationStatus = viewModel.VerificationStatus;
+            vehicle.Year = viewModel.Year;
 
             await _db.SaveChangesAsync();
 

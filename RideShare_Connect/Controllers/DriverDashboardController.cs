@@ -521,14 +521,13 @@ namespace RideShare_Connect.Controllers
                 return NotFound();
             }
 
-            var model = new EditVehicleViewModel
+            var model = new DriverEditVehicleViewModel
             {
                 Id = vehicle.Id,
                 CarMaker = vehicle.CarMaker,
                 Model = vehicle.Model,
                 VehicleType = vehicle.VehicleType,
                 LicensePlate = vehicle.LicensePlate,
-                VerificationStatus = vehicle.VerificationStatus,
                 Year = vehicle.Year
             };
 
@@ -538,7 +537,7 @@ namespace RideShare_Connect.Controllers
         [Authorize(Roles = "Driver")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditVehicle(EditVehicleViewModel model)
+        public async Task<IActionResult> EditVehicle(DriverEditVehicleViewModel viewModel)
         {
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdValue) || !int.TryParse(userIdValue, out var userId))
@@ -548,21 +547,21 @@ namespace RideShare_Connect.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewModel);
             }
 
-            var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == model.Id && v.DriverId == userId);
+            var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == viewModel.Id && v.DriverId == userId);
             if (vehicle == null)
             {
                 return NotFound();
             }
 
-            vehicle.CarMaker = model.CarMaker;
-            vehicle.Model = model.Model;
-            vehicle.VehicleType = model.VehicleType;
-            vehicle.LicensePlate = model.LicensePlate;
-            vehicle.Year = model.Year;
-            vehicle.VerificationStatus = model.VerificationStatus;
+            vehicle.CarMaker = viewModel.CarMaker;
+            vehicle.Model = viewModel.Model;
+            vehicle.VehicleType = viewModel.VehicleType;
+            vehicle.LicensePlate = viewModel.LicensePlate;
+            vehicle.Year = viewModel.Year;
+            vehicle.VerificationStatus = "Pending";
 
             await _db.SaveChangesAsync();
 
