@@ -52,3 +52,8 @@
 [30-11-2025 00:09:28] BookRide called. ID: 4 - Starting Transaction. - Success.
 [30-11-2025 00:12:37] BookRide called. ID: 4 - Starting Transaction. - Success.
 [30-11-2025 00:18:41] BookRide called. ID: 4 - Starting Transaction. - Success.
+[30-11-2025 00:30:04] CancelRide called. BookingID: 12 - Cancelled successfully.
+[30-11-2025 00:40:03] BookRide called. ID: 4 - Starting Transaction. - Success.
+[30-11-2025 00:40:25] CancelRide called. BookingID: 13 - Cancelled successfully.
+[30-11-2025 00:43:38] BookRide called. ID: 4 - Starting Transaction. - Success.
+[30-11-2025 00:43:51] CancelRide called. BookingID: 14 - Cancelled successfully.

@@ -352,6 +352,7 @@
                                                 <th>Seats</th>
                                                 <th>Total Fare</th>
                                                 <th>Status</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -364,6 +365,12 @@
                                                     <td>@booking.BookedSeats</td>
                                                     <td>@((booking.BookedSeats * booking.Ride.PricePerSeat * booking.DistanceKm).ToString("C"))</td>
                                                     <td>@booking.Status</td>
+                                                    <td>
+                                                        <form asp-action="CancelRide" asp-route-id="@booking.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this ride?');">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                        </form>
+                                                    </td>
                                                 </tr>
                                             }
                                             @if (!Model.Bookings.Any(b => b.Status == "Ongoing"))
@@ -481,74 +488,9 @@
                     <!-- My Bookings Tab -->
                     <div class="tab-pane fade" id="bookings-tab-pane" role="tabpanel" tabindex="0">
                         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                            <h1 class="h2">My Bookings</h1>
+                            <h1 class="h2">All Bookings</h1>
                         </div>
 
-                        @{
-        var scheduled = (Model.Bookings ?? Enumerable.Empty<RideBooking>())
-        .Where(b => string.Equals(b.Status, "Pending", StringComparison.OrdinalIgnoreCase))
-        .OrderByDescending(b => b.BookingTime)
-        .ToList();
-
-        var completed = (Model.Bookings ?? Enumerable.Empty<RideBooking>())
-        .Where(b => string.Equals(b.Status, "Completed", StringComparison.OrdinalIgnoreCase))
-        .OrderByDescending(b => b.BookingTime)
-        .ToList();
-                        }
-
-
-                        <!-- Scheduled Rides -->
-                        <h5 class="mb-3">Scheduled</h5>
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Pickup - Drop</th>
-                                                <th>Vehicle No</th>
-                                                <th>Date & Time</th>
-                                                <th>Total Fare</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (scheduled.Any())
-                        {
-                                            @foreach (var booking in scheduled)
-                            {
-                                            <tr>
-                                                <td>
-                                                    <strong>
-                                                        @booking.PickupLocation <i class="bi bi-arrow-right"></i> @booking.DropLocation
-                                                    </strong>
-                                                </td>
-                                                <td>@booking.Ride.Vehicle.LicensePlate</td>
-                                                <td>@booking.Ride.DepartureTime.ToString("dd MMM yyyy, hh:mm tt")</td>
-                                                        <td>
-                                                            @((booking.BookedSeats * booking.Ride.PricePerSeat * booking.Ride.DistanceKm).ToString("C"))</td>
-                                                <td>@booking.Status</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
-                                                </td>
-                                            </tr>
-                            }
-                        }
-                        else
-                        {
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted">No scheduled bookings found</td>
-                                            </tr>
-                        }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Completed Rides -->
-                        <h5 class="mb-3">Completed</h5>
                         <div class="card">
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -564,40 +506,75 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if (completed.Any())
-                        {
-                                            @foreach (var booking in completed)
-                            {
-                                            <tr>
-                                                <td>
-                                                    <strong>
-                                                        @booking.PickupLocation <i class="bi bi-arrow-right"></i> @booking.DropLocation
-                                                    </strong>
-                                                </td>
-                                                <td>@booking.Ride.Vehicle.LicensePlate</td>
-                                                <td>@booking.Ride.DepartureTime.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                            @if (Model.Bookings != null && Model.Bookings.Any())
+                                            {
+                                                @foreach (var booking in Model.Bookings.OrderByDescending(b => b.BookingTime))
+                                                {
+                                                    <tr>
                                                         <td>
-                                                            @((booking.Ride.PricePerSeat * booking.Ride.DistanceKm).ToString("C"))</td>
-                                                <td>@booking.Status</td>
-                                                <td>
-                                                    <a asp-controller="Review"
-                                                       asp-action="Review"
-                                                       asp-route-rideId="@booking.Ride.Id"
-                                                       asp-route-driverId="@booking.Ride.DriverId"
-                                                       class="btn btn-sm btn-outline-primary">
-                                                        Give a review
-                                                    </a>
-
-                                                </td>
-                                            </tr>
-                            }
-                        }
-                        else
-                        {
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted">No completed bookings found</td>
-                                            </tr>
-                        }
+                                                            <strong>
+                                                                @booking.PickupLocation <i class="bi bi-arrow-right"></i> @booking.DropLocation
+                                                            </strong>
+                                                        </td>
+                                                        <td>@booking.Ride.Vehicle.LicensePlate</td>
+                                                        <td>@booking.Ride.DepartureTime.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                                        <td>
+                                                            @((booking.BookedSeats * booking.Ride.PricePerSeat * booking.DistanceKm).ToString("C"))
+                                                        </td>
+                                                        <td>
+                                                            @if (booking.Status == "Pending")
+                                                            {
+                                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                            }
+                                                            else if (booking.Status == "Ongoing")
+                                                            {
+                                                                <span class="badge bg-primary">Ongoing</span>
+                                                            }
+                                                            else if (booking.Status == "Completed")
+                                                            {
+                                                                <span class="badge bg-success">Completed</span>
+                                                            }
+                                                            else if (booking.Status == "Cancelled")
+                                                            {
+                                                                <span class="badge bg-danger">Cancelled</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge bg-secondary">@booking.Status</span>
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @if (booking.Status == "Pending" || booking.Status == "Ongoing")
+                                                            {
+                                                                <form asp-action="CancelRide" asp-route-id="@booking.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this ride?');">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                                </form>
+                                                            }
+                                                            else if (booking.Status == "Completed")
+                                                            {
+                                                                <a asp-controller="Review"
+                                                                   asp-action="Review"
+                                                                   asp-route-rideId="@booking.Ride.Id"
+                                                                   asp-route-driverId="@booking.Ride.DriverId"
+                                                                   class="btn btn-sm btn-outline-primary">
+                                                                    Review
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="text-muted">-</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">No bookings found</td>
+                                                </tr>
+                                            }
                                         </tbody>
                                     </table>
                                 </div>

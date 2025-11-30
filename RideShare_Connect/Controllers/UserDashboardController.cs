@@ -282,7 +282,7 @@ namespace RideShare_Connect.Controllers
                     }
 
                     // Calculate Fare
-                    var totalFare = ride.PricePerSeat * dto.NumPersons;
+                    var totalFare = ride.PricePerSeat * dto.NumPersons * dto.DistanceKm;
 
                     // Payment Logic
                     if (dto.PaymentMode == "Wallet")
@@ -381,6 +381,93 @@ namespace RideShare_Connect.Controllers
             {
                 System.IO.File.AppendAllText("debug_log.txt", $" - Outer Error: {ex}");
                 return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelRide(int id)
+        {
+            try
+            {
+                var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                {
+                    return Unauthorized();
+                }
+
+                System.IO.File.AppendAllText("debug_log.txt", $"\n[{DateTime.Now}] CancelRide called. BookingID: {id}");
+
+                await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+                try
+                {
+                    var booking = await _db.RideBookings
+                        .Include(b => b.Ride)
+                        .FirstOrDefaultAsync(b => b.Id == id && b.PassengerId == userId);
+
+                    if (booking == null)
+                    {
+                        System.IO.File.AppendAllText("debug_log.txt", " - Booking not found or unauthorized.");
+                        return NotFound("Booking not found.");
+                    }
+
+                    if (booking.Status == "Cancelled" || booking.Status == "Completed")
+                    {
+                        System.IO.File.AppendAllText("debug_log.txt", $" - Cannot cancel. Status: {booking.Status}");
+                        return BadRequest("Cannot cancel this ride.");
+                    }
+
+                    // 1. Update Booking Status
+                    booking.Status = "Cancelled";
+                    _db.RideBookings.Update(booking);
+
+                    // 2. Refund to Wallet
+                    var refundAmount = booking.Ride.PricePerSeat * booking.BookedSeats * booking.DistanceKm; // Calculate based on deduction logic
+                    var userWallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+                    
+                    if (userWallet != null)
+                    {
+                        userWallet.Balance += refundAmount;
+                        _db.Wallets.Update(userWallet);
+
+                        _db.WalletTransactions.Add(new WalletTransaction
+                        {
+                            WalletId = userWallet.Id,
+                            Amount = refundAmount,
+                            TxnType = "Credit",
+                            TxnDate = DateTime.UtcNow,
+                            Description = $"Refund for Ride #{booking.RideId}",
+                            TransactionId = Guid.NewGuid().ToString(),
+                            PaymentMethod = "Wallet",
+                            Status = "Completed"
+                        });
+                    }
+
+                    // 3. Release Seats
+                    var ride = booking.Ride;
+                    if (ride != null)
+                    {
+                        ride.AvailableSeats += booking.BookedSeats;
+                        _db.Rides.Update(ride);
+                    }
+
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    System.IO.File.AppendAllText("debug_log.txt", " - Cancelled successfully.");
+                    return RedirectToAction(nameof(User));
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    System.IO.File.AppendAllText("debug_log.txt", $" - Transaction Error: {ex}");
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cancelling ride");
+                return StatusCode(500, "Internal server error.");
             }
         }
     }
