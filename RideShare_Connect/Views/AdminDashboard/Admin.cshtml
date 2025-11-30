@@ -452,11 +452,11 @@
                             <div class="card border-0 shadow-sm h-100 bg-success text-white">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title mb-0">Platform Commission</h5>
-                                        <i class="bi bi-percent fs-4 opacity-50"></i>
+                                        <h5 class="card-title mb-0">Platform Wallet</h5>
+                                        <i class="bi bi-wallet-fill fs-4 opacity-50"></i>
                                     </div>
-                                    <h2 class="display-6 fw-bold mb-0">₹@(Model.TotalRevenue * 0.1m)</h2>
-                                    <p class="mb-0 opacity-75 mt-2">Estimated commission (10%)</p>
+                                    <h2 class="display-6 fw-bold mb-0">₹@Model.PlatformWalletBalance.ToString("N2")</h2>
+                                    <p class="mb-0 opacity-75 mt-2">Accumulated Commission</p>
                                 </div>
                             </div>
                         </div>

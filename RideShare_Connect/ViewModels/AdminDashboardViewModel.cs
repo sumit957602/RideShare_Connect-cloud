@@ -10,6 +10,7 @@ namespace RideShare_Connect.ViewModels
     public class AdminDashboardViewModel
     {
         public decimal TotalRevenue { get; set; }
+        public decimal PlatformWalletBalance { get; set; }
         public int TotalUsers { get; set; }
         public int RidesCompleted { get; set; }
         public int OpenReports { get; set; }

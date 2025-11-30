@@ -28,9 +28,25 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("AdminLogin", "AdminAccount");
             }
 
+            // Ensure Platform Wallet exists (Singleton)
+            var platformWallet = _db.PlatformWallets.FirstOrDefault();
+            if (platformWallet == null)
+            {
+                // Initialize with existing commissions if wallet is new
+                var totalCommission = _db.Commissions.Sum(c => (decimal?)c.PlatformFee) ?? 0;
+                platformWallet = new RideShare_Connect.Models.PaymentManagement.PlatformWallet
+                {
+                    Balance = totalCommission,
+                    LastUpdated = DateTime.UtcNow
+                };
+                _db.PlatformWallets.Add(platformWallet);
+                _db.SaveChanges();
+            }
+
             var viewModel = new AdminDashboardViewModel
             {
                 TotalRevenue = _db.Payments.Where(p => p.Status == "Completed").Sum(p => (decimal?)p.Amount) ?? 0,
+                PlatformWalletBalance = platformWallet.Balance,
                 TotalUsers = _db.Users.Count(),
                 RidesCompleted = _db.Rides.Count(r => r.Status == "Completed"),
                 OpenReports = _db.UserReports.Count(r => r.Status == "Pending"),
