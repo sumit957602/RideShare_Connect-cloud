@@ -15,5 +15,9 @@ namespace RideShare_Connect.ViewModels
         public List<WalletTransaction> TransactionHistory { get; set; } = new();
         public List<PaymentMethod> PaymentMethods { get; set; } = new();
         public UserProfile Profile { get; set; }
+        
+        // Pagination
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace RideShare_Connect.Controllers
             _config = config;
         }
 
-        public async Task<IActionResult> Finance()
+        public async Task<IActionResult> Finance(int page = 1)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim))
@@ -44,14 +44,25 @@ namespace RideShare_Connect.Controllers
                 .Where(p => p.Status == "Completed" && p.PaymentDate >= startOfMonth)
                 .SumAsync(p => p.Amount);
 
-            var walletTransactions = new List<WalletTransaction>();
-            if (wallet != null)
-            {
-                walletTransactions = await _db.WalletTransactions
-                    .Where(t => t.WalletId == wallet.Id)
-                    .OrderByDescending(t => t.TxnDate)
-                    .ToListAsync();
-            }
+            var walletTransactionsQuery = _db.WalletTransactions
+                .Where(t => t.WalletId == (wallet != null ? wallet.Id : 0))
+                .OrderByDescending(t => t.TxnDate);
+
+            // Pagination Logic
+            int pageSize = 10;
+            int totalTransactions = await walletTransactionsQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalTransactions / (double)pageSize);
+            
+            // Ensure page is within valid range
+            page = Math.Max(1, Math.Min(page, totalPages > 0 ? totalPages : 1));
+
+            var walletTransactions = await walletTransactionsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Recent transactions (always top 3)
+            var recentTransactions = await walletTransactionsQuery.Take(3).ToListAsync();
 
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
@@ -62,13 +73,87 @@ namespace RideShare_Connect.Controllers
                 TotalSavedOnRides = 0,
                 PaymentMethods = await _db.PaymentMethods.Where(pm => pm.UserId == userId).ToListAsync(),
                 TransactionHistory = walletTransactions,
-                RecentTransactions = walletTransactions.Take(3).ToList(),
-                Profile = profile
+                RecentTransactions = recentTransactions,
+                Profile = profile,
+                CurrentPage = page,
+                TotalPages = totalPages
             };
 
             ViewBag.RazorpayKey = _config["PaymentGateway:ApiKey"];
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTransactionHistory(int page = 1)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+            
+            var walletTransactionsQuery = _db.WalletTransactions
+                .Where(t => t.WalletId == (wallet != null ? wallet.Id : 0))
+                .OrderByDescending(t => t.TxnDate);
+
+            // Pagination Logic
+            int pageSize = 10;
+            int totalTransactions = await walletTransactionsQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalTransactions / (double)pageSize);
+            
+            // Ensure page is within valid range
+            page = Math.Max(1, Math.Min(page, totalPages > 0 ? totalPages : 1));
+
+            var walletTransactions = await walletTransactionsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new FinanceViewModel
+            {
+                TransactionHistory = walletTransactions,
+                CurrentPage = page,
+                TotalPages = totalPages
+            };
+
+            return PartialView("_TransactionHistoryTable", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportTransactions()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+            if (wallet == null)
+            {
+                return NotFound();
+            }
+
+            var transactions = await _db.WalletTransactions
+                .Where(t => t.WalletId == wallet.Id)
+                .OrderByDescending(t => t.TxnDate)
+                .ToListAsync();
+
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Transaction ID,Date,Status,Type,Amount,Description");
+
+            foreach (var txn in transactions)
+            {
+                var line = $"{txn.TransactionId},{txn.TxnDate:yyyy-MM-dd HH:mm:ss},{txn.Status},{txn.TxnType},{txn.Amount},{txn.Description?.Replace(",", " ")}";
+                csv.AppendLine(line);
+            }
+
+            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", $"transactions_{DateTime.Now:yyyyMMddHHmmss}.csv");
         }
 
         [HttpGet]

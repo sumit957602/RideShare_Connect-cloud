@@ -103,36 +103,54 @@
                                 </div>
                             </div>
 
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-3">Recent Transactions</h5>
-                <ul class="list-group list-group-flush">
-                    @if (Model.RecentTransactions.Any())
-                    {
-                        foreach (var txn in Model.RecentTransactions)
-                        {
-                            var isCredit = txn.TxnType?.ToLower() == "credit";
-                            var isSuccessful = txn.Status?.ToLower() == "successful";
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>@txn.TxnDate.ToString("yyyy-MM-dd")</span>
-                                @if (isSuccessful)
-                                {
-                                    <span class="@(isCredit ? "text-success" : "text-danger") fw-bold">
-                                         @txn.PaymentMethod @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("F2")
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="fw-bold">@txn.Status @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("F2")</span>
-                                }
-                            </li>
-                        }
-                    }
-                    else
-                    {
-                        <li class="list-group-item text-muted">No recent transactions.</li>
-                    }
-                </ul>
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Recent Transactions</h5>
+                                    <button class="btn btn-sm btn-link text-decoration-none" onclick="document.getElementById('v-pills-history-tab').click()">View All</button>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        @if (Model.RecentTransactions.Any())
+                                        {
+                                            foreach (var txn in Model.RecentTransactions)
+                                            {
+                                                var isCredit = txn.TxnType?.ToLower() == "credit";
+                                                var isSuccessful = txn.Status?.ToLower() == "successful";
+                                                
+                                                <li class="list-group-item d-flex align-items-center py-3">
+                                                    <div class="icon-shape icon-md rounded-circle @(isSuccessful ? (isCredit ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger") : "bg-secondary-subtle text-secondary") me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+                                                        @if(isSuccessful)
+                                                        {
+                                                            <i class="bi @(isCredit ? "bi-arrow-down-left" : "bi-arrow-up-right") fs-5"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-exclamation-lg fs-5"></i>
+                                                        }
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-0">@txn.Description</h6>
+                                                        <small class="text-muted">@txn.TxnDate.ToString("MMM dd, hh:mm tt")</small>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <h6 class="mb-0 @(isSuccessful ? (isCredit ? "text-success" : "text-danger") : "text-muted")">
+                                                            @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("F2")
+                                                        </h6>
+                                                        <small class="badge @(isSuccessful ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning-emphasis") rounded-pill border border-0">
+                                                            @txn.Status
+                                                        </small>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li class="list-group-item text-center py-4 text-muted">
+                                                <i class="bi bi-receipt fs-1 mb-2 d-block text-secondary"></i>
+                                                No recent transactions found.
+                                            </li>
+                                        }
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -174,54 +192,14 @@
 
                         <!-- Transaction History Tab -->
                         <div class="tab-pane fade" id="v-pills-history" role="tabpanel" aria-labelledby="v-pills-history-tab" tabindex="0">
-                            <h4 class="mb-4">Full Transaction History</h4>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Transaction ID</th>
-                            <th>Date</th>
-                            <th>Transction Status</th>
-                            <th>Amount</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.TransactionHistory.Any())
-                        {
-                            foreach (var txn in Model.TransactionHistory)
-                            {
-                                var isCredit = txn.TxnType?.ToLower() == "credit";
-                                var isSuccessful = txn.Status?.ToLower() == "successful";
-                                <tr>
-                                    <td>@txn.TransactionId</td>
-                                    <td>@txn.TxnDate.ToString("yyyy-MM-dd")</td>
-                                    <td>@(isSuccessful ? txn.TxnType : txn.Status)</td>
-                                    <td class="@(isSuccessful ? (isCredit ? "text-success" : "text-danger") : "")">
-                                        @if (isSuccessful)
-                                        {
-                                            @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("F2")
-                                        }
-                                        else
-                                        {
-                                            @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("F2")
-                                        }
-                                    </td>
-                                    <td>@txn.Description</td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">No transactions found.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                                    </div>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="mb-0">Transaction History</h4>
+                                <a asp-action="ExportTransactions" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download me-1"></i>Export</a>
+                            </div>
+                            
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body p-0" id="transaction-history-container">
+                                    <partial name="_TransactionHistoryTable" model="Model" />
                                 </div>
                             </div>
                         </div>
@@ -332,6 +310,26 @@
 
             const rzp = new Razorpay(options);
             rzp.open();
+        });
+
+
+        // AJAX Pagination for Transaction History
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('transaction-history-container');
+            
+            container.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A' && e.target.classList.contains('ajax-pagination-link')) {
+                    e.preventDefault();
+                    const url = e.target.getAttribute('href');
+                    
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            container.innerHTML = html;
+                        })
+                        .catch(error => console.error('Error loading transactions:', error));
+                }
+            });
         });
     </script>
 </body>
