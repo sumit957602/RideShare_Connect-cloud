@@ -22,17 +22,20 @@ namespace RideShare_Connect.Models.PaymentManagement
         [StringLength(100)]
         public string? CardholderName { get; set; }
 
-        [Required]
-        [StringLength(16)]
+        [Required(ErrorMessage = "Card Number is required")]
+        [StringLength(16, MinimumLength = 16, ErrorMessage = "Card Number must be 16 digits")]
+        [RegularExpression(@"^[0-9]{16}$", ErrorMessage = "Invalid Card Number")]
         public string? CardNumber { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Expiry Date is required")]
         [StringLength(7)]
         [Column(TypeName = "nvarchar(7)")]
+        [RegularExpression(@"^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$", ErrorMessage = "Invalid Expiry Date (MM/YYYY)")]
         public string? ExpiryDate { get; set; }
 
-        [Required]
-        [StringLength(4)]
+        [Required(ErrorMessage = "CVV is required")]
+        [StringLength(4, MinimumLength = 3, ErrorMessage = "CVV must be 3 or 4 digits")]
+        [RegularExpression(@"^[0-9]{3,4}$", ErrorMessage = "Invalid CVV")]
         public string? CVV { get; set; }
 
         [StringLength(100)]

@@ -1,24 +1,21 @@
 @model RideShare_Connect.Models.PaymentManagement.PaymentMethod
 @{
-    ViewData["Title"] = "Add Payment Method";
+    ViewData["Title"] = "Edit Payment Method";
 }
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white py-3">
-                    <h4 class="mb-0"><i class="bi bi-credit-card-2-front me-2"></i>Add Payment Method</h4>
+                <div class="card-header bg-warning text-dark py-3">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Payment Method</h4>
                 </div>
                 <div class="card-body p-4">
-                    <p class="text-muted small mb-4">
-                        <i class="bi bi-shield-lock-fill text-success me-1"></i>
-                        Your payment information is securely handled by our PCI-compliant payment partner.
-                    </p>
-                    
-                    <form asp-action="AddPaymentMethod" method="post">
+                    <form asp-action="EditPaymentMethod" method="post">
                         @Html.AntiForgeryToken()
-                        
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+
                         <div class="mb-3">
                             <label asp-for="CardType" class="form-label fw-bold">Card Type</label>
                             <div class="input-group">
@@ -69,8 +66,8 @@
                         </div>
 
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-check-circle me-2"></i>Save Method
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Update Method
                             </button>
                             <a asp-action="Finance" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>Cancel

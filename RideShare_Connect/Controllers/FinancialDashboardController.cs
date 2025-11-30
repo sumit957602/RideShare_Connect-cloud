@@ -88,6 +88,8 @@ namespace RideShare_Connect.Controllers
             }
             var userId = int.Parse(userIdClaim);
 
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
             if (!ModelState.IsValid)
             {
                 return View(method);
@@ -140,6 +142,120 @@ namespace RideShare_Connect.Controllers
         public IActionResult TopUpWallet()
         {
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditPaymentMethod(int id)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var method = await _db.PaymentMethods
+                .FirstOrDefaultAsync(pm => pm.Id == id && pm.UserId == userId);
+
+            if (method == null)
+            {
+                return NotFound();
+            }
+
+            return View(method);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPaymentMethod(int id, PaymentMethod method)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            if (id != method.Id)
+            {
+                return NotFound();
+            }
+
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingMethod = await _db.PaymentMethods
+                        .FirstOrDefaultAsync(pm => pm.Id == id && pm.UserId == userId);
+
+                    if (existingMethod == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingMethod.CardType = method.CardType;
+                    existingMethod.CardholderName = method.CardholderName;
+                    existingMethod.CardNumber = method.CardNumber;
+                    existingMethod.ExpiryDate = method.ExpiryDate;
+                    existingMethod.CVV = method.CVV;
+
+                    if (!string.IsNullOrEmpty(method.CardNumber))
+                    {
+                        var digits = method.CardNumber.Replace(" ", "");
+                        if (digits.Length >= 4)
+                        {
+                            existingMethod.CardLast4Digit = digits[^4..];
+                        }
+                    }
+
+                    _db.Update(existingMethod);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PaymentMethodExists(method.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Finance));
+            }
+            return View(method);
+        }
+
+        [HttpPost, ActionName("DeletePaymentMethod")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePaymentMethodConfirmed(int id)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var method = await _db.PaymentMethods
+                .FirstOrDefaultAsync(pm => pm.Id == id && pm.UserId == userId);
+
+            if (method != null)
+            {
+                _db.PaymentMethods.Remove(method);
+                await _db.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Finance));
+        }
+
+        private bool PaymentMethodExists(int id)
+        {
+            return _db.PaymentMethods.Any(e => e.Id == id);
         }
 
         [HttpGet]
