@@ -20,5 +20,17 @@ namespace RideShare_Connect.ViewModels
 
         public List<Ride> Rides { get; set; } = new();
         public List<RideBooking> RideBookings { get; set; } = new();
+
+        public List<UserReport> Reports { get; set; } = new();
+        public List<Payment> Payments { get; set; } = new();
+        public SystemConfigViewModel SystemConfig { get; set; } = new();
+    }
+
+    public class SystemConfigViewModel
+    {
+        public decimal CommissionRate { get; set; } = 10.0m;
+        public bool MaintenanceMode { get; set; } = false;
+        public string SupportEmail { get; set; } = "support@rideshareconnect.com";
+        public string SupportPhone { get; set; } = "+91 1234567890";
     }
 }

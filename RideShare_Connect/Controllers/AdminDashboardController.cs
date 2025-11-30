@@ -41,7 +41,10 @@ namespace RideShare_Connect.Controllers
                 RideBookings = _db.RideBookings
                     .Include(rb => rb.User)
                     .ThenInclude(u => u.UserProfile)
-                    .ToList()
+                    .ToList(),
+                Reports = _db.UserReports.Include(r => r.ReportingUser).Include(r => r.ReportedUser).OrderByDescending(r => r.CreatedAt).ToList(),
+                Payments = _db.Payments.OrderByDescending(p => p.PaymentDate).Take(50).ToList(),
+                SystemConfig = new SystemConfigViewModel() // Placeholder for now
             };
 
             return View(viewModel);

@@ -49,110 +49,130 @@
     <main class="flex-grow-1">
         <div class="container-fluid h-100">
             <div class="row h-100">
-                <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block">
+                <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
                     <div class="position-sticky pt-3">
                         <ul class="nav flex-column" id="sidebar-nav" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#dashboard-tab-pane" role="tab" aria-selected="true">
-                                    <i class="bi bi-speedometer2"></i>Dashboard
+                                <a class="nav-link active text-white" data-bs-toggle="tab" data-bs-target="#dashboard-tab-pane" role="tab" aria-selected="true">
+                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#users-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-people-fill"></i>User Management
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#users-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-people-fill me-2"></i>User Management
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#drivers-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-person-badge-fill"></i>Driver Management
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#drivers-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-person-badge-fill me-2"></i>Driver Management
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#vehicles-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-truck"></i>Vehicle Management
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#vehicles-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-truck me-2"></i>Vehicle Management
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#rides-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-car-front-fill"></i>Ride Management
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#rides-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-car-front-fill me-2"></i>Ride Management
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#reports-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-flag-fill"></i>Reports & Complaints
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#reports-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-flag-fill me-2"></i>Reports & Complaints
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#financials-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-cash-coin"></i>Financials
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#financials-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-cash-coin me-2"></i>Financials
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#config-tab-pane" role="tab" aria-selected="false">
-                                    <i class="bi bi-gear-fill"></i>System Config
+                                <a class="nav-link text-white-50" data-bs-toggle="tab" data-bs-target="#config-tab-pane" role="tab" aria-selected="false">
+                                    <i class="bi bi-gear-fill me-2"></i>System Config
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </nav>
 
-                <div class="col-md-9 ms-sm-auto col-lg-10 main-content">
+                <div class="col-md-9 ms-sm-auto col-lg-10 main-content px-4 py-4 bg-light">
                     <div class="tab-content" id="adminTabContent">
                         <div class="tab-pane fade show active" id="dashboard-tab-pane" role="tabpanel" tabindex="0">
-                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                                <h1 class="h2">Dashboard</h1>
+                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                                <h1 class="h2">Dashboard Overview</h1>
                             </div>
-                            <div class="row g-4">
+                            <div class="row g-4 mb-4">
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="stat-card d-flex align-items-center">
-                                        <div class="icon bg-primary-subtle text-primary me-3"><i class="bi bi-cash-coin"></i></div>
-                                        <div>
-                                            <h4 class="mb-0">₹@Model.TotalRevenue</h4>
-                                            <p class="text-muted mb-0">Total Revenue</p>
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center">
+                                            <div class="icon-shape icon-lg bg-primary-subtle text-primary rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                                <i class="bi bi-cash-coin fs-2"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="mb-0 fw-bold">₹@Model.TotalRevenue</h4>
+                                                <p class="text-muted mb-0">Total Revenue</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="stat-card d-flex align-items-center">
-                                        <div class="icon bg-success-subtle text-success me-3"><i class="bi bi-people-fill"></i></div>
-                                        <div>
-                                              <h4 class="mb-0">@Model.TotalUsers</h4>
-                                            <p class="text-muted mb-0">Total Users</p>
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center">
+                                            <div class="icon-shape icon-lg bg-success-subtle text-success rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                                <i class="bi bi-people-fill fs-2"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="mb-0 fw-bold">@Model.TotalUsers</h4>
+                                                <p class="text-muted mb-0">Total Users</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="stat-card d-flex align-items-center">
-                                        <div class="icon bg-info-subtle text-info me-3"><i class="bi bi-car-front-fill"></i></div>
-                                        <div>
-                                              <h4 class="mb-0">@Model.RidesCompleted</h4>
-                                            <p class="text-muted mb-0">Rides Completed</p>
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center">
+                                            <div class="icon-shape icon-lg bg-info-subtle text-info rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                                <i class="bi bi-car-front-fill fs-2"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="mb-0 fw-bold">@Model.RidesCompleted</h4>
+                                                <p class="text-muted mb-0">Rides Completed</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="stat-card d-flex align-items-center">
-                                        <div class="icon bg-danger-subtle text-danger me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-                                        <div>
-                                              <h4 class="mb-0">@Model.OpenReports</h4>
-                                            <p class="text-muted mb-0">Open Reports</p>
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center">
+                                            <div class="icon-shape icon-lg bg-danger-subtle text-danger rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                                <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="mb-0 fw-bold">@Model.OpenReports</h4>
+                                                <p class="text-muted mb-0">Open Reports</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row g-4 mt-2">
+                            <div class="row g-4">
                                 <div class="col-lg-7">
-                                    <div class="card">
-                                        <div class="card-header bg-white">User Growth</div>
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-header bg-white py-3">
+                                            <h5 class="card-title mb-0">User Growth</h5>
+                                        </div>
                                         <div class="card-body">
                                             <canvas id="userGrowthChart"></canvas>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-5">
-                                    <div class="card">
-                                        <div class="card-header bg-white">Revenue by Month</div>
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-header bg-white py-3">
+                                            <h5 class="card-title mb-0">Revenue by Month</h5>
+                                        </div>
                                         <div class="card-body">
                                             <canvas id="revenueChart"></canvas>
                                         </div>
@@ -162,128 +182,133 @@
                         </div>
 
                         <div class="tab-pane fade" id="users-tab-pane" role="tabpanel" tabindex="0">
-                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
                                 <h1 class="h2">User Management</h1>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light">
                                                 <tr>
-                                                    <th>User ID</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Role</th>
-                                                    <th>Status</th>
-                                                    <th>Joined Date</th>
-                                                    <th>Actions</th>
+                                                    <th class="ps-4 py-3">User ID</th>
+                                                    <th class="py-3">Name</th>
+                                                    <th class="py-3">Email</th>
+                                                    <th class="py-3">Role</th>
+                                                    <th class="py-3">Status</th>
+                                                    <th class="py-3">Joined Date</th>
+                                                    <th class="pe-4 py-3">Actions</th>
                                                 </tr>
                                             </thead>
-                                              <tbody>
-                                                  @foreach (var user in Model.Users)
-                                                  {
-                                                      <tr>
-                                                          <td>@user.Id</td>
-                                                          <td>@user.UserProfile?.FullName</td>
-                                                          <td>@user.Email</td>
-                                                          <td><span class="badge @(user.UserType == "Driver" ? "bg-info-subtle text-info-emphasis" : "bg-primary-subtle text-primary-emphasis") rounded-pill">@user.UserType</span></td>
-                                                          <td><span class="badge @(user.AccountStatus == "Active" ? "bg-success-subtle text-success-emphasis" : "bg-danger-subtle text-danger-emphasis") rounded-pill">@user.AccountStatus</span></td>
-                                                          <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
-                                                          <td>
-                                                              <a asp-action="EditUser" asp-route-id="@user.Id" class="btn btn-sm btn-outline-secondary table-action-btn" title="Edit User"><i class="bi bi-pencil-fill"></i></a>
-                                                              <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" class="d-inline">
-                                                                  <button type="submit" class="btn btn-sm btn-outline-danger table-action-btn" title="Delete User" onclick="return confirm('Are you sure you want to delete this user?');"><i class="bi bi-slash-circle-fill"></i></button>
-                                                              </form>
-                                                          </td>
-                                                      </tr>
-                                                  }
-                                              </tbody>
+                                            <tbody>
+                                                @foreach (var user in Model.Users)
+                                                {
+                                                    <tr>
+                                                        <td class="ps-4">@user.Id</td>
+                                                        <td class="fw-medium">@user.UserProfile?.FullName</td>
+                                                        <td>@user.Email</td>
+                                                        <td><span class="badge @(user.UserType == "Driver" ? "bg-info-subtle text-info-emphasis" : "bg-primary-subtle text-primary-emphasis") rounded-pill border border-0">@user.UserType</span></td>
+                                                        <td><span class="badge @(user.AccountStatus == "Active" ? "bg-success-subtle text-success-emphasis" : "bg-danger-subtle text-danger-emphasis") rounded-pill border border-0">@user.AccountStatus</span></td>
+                                                        <td>@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                                        <td class="pe-4">
+                                                            <div class="btn-group btn-group-sm">
+                                                                <a asp-action="EditUser" asp-route-id="@user.Id" class="btn btn-outline-secondary" title="Edit User"><i class="bi bi-pencil-fill"></i></a>
+                                                                <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                                    <button type="submit" class="btn btn-outline-danger ms-1" title="Delete User" onclick="return confirm('Are you sure you want to delete this user?');"><i class="bi bi-trash-fill"></i></button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
                                         </table>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-              <div class="tab-pane fade" id="drivers-tab-pane" role="tabpanel" tabindex="0">
-                  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                      <h1 class="h2">Driver Management</h1>
-                  </div>
-                  <div class="card">
-                      <div class="card-body">
-                          <div class="table-responsive">
-                              <table class="table table-hover">
-                                  <thead>
-                                      <tr>
-                                          <th>Driver ID</th>
-                                          <th>Name</th>
-                                          <th>Email</th>
-                                          <th>Phone</th>
-                                          <th>Actions</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      @foreach (var driver in Model.Drivers)
-                                      {
-                                          <tr>
-                                              <td>@driver.DriverId</td>
-                                              <td>@driver.FullName</td>
-                                              <td>@driver.Email</td>
-                                              <td>@driver.PhoneNumber</td>
-                                              <td>
-                                                  <a asp-action="EditDriver" asp-route-id="@driver.DriverId" class="btn btn-sm btn-outline-secondary table-action-btn" title="Edit Driver"><i class="bi bi-pencil-fill"></i></a>
-                                                  <form asp-action="DeleteDriver" asp-route-id="@driver.DriverId" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this driver?');">
-                                                      <button type="submit" class="btn btn-sm btn-outline-danger table-action-btn" title="Delete Driver"><i class="bi bi-trash-fill"></i></button>
-                                                  </form>
-                                              </td>
-                                          </tr>
-                                      }
-                                  </tbody>
-                              </table>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+                        <div class="tab-pane fade" id="drivers-tab-pane" role="tabpanel" tabindex="0">
+                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                                <h1 class="h2">Driver Management</h1>
+                            </div>
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th class="ps-4 py-3">Driver ID</th>
+                                                    <th class="py-3">Name</th>
+                                                    <th class="py-3">Email</th>
+                                                    <th class="py-3">Phone</th>
+                                                    <th class="pe-4 py-3">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var driver in Model.Drivers)
+                                                {
+                                                    <tr>
+                                                        <td class="ps-4">@driver.DriverId</td>
+                                                        <td class="fw-medium">@driver.FullName</td>
+                                                        <td>@driver.Email</td>
+                                                        <td>@driver.PhoneNumber</td>
+                                                        <td class="pe-4">
+                                                            <div class="btn-group btn-group-sm">
+                                                                <a asp-action="EditDriver" asp-route-id="@driver.DriverId" class="btn btn-outline-secondary" title="Edit Driver"><i class="bi bi-pencil-fill"></i></a>
+                                                                <form asp-action="DeleteDriver" asp-route-id="@driver.DriverId" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this driver?');">
+                                                                    <button type="submit" class="btn btn-outline-danger ms-1" title="Delete Driver"><i class="bi bi-trash-fill"></i></button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-             
               <div class="tab-pane fade" id="vehicles-tab-pane" role="tabpanel" tabindex="0">
-                  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
                       <h1 class="h2">Vehicle Management</h1>
                   </div>
-                  <div class="card">
-                      <div class="card-body">
+                  <div class="card border-0 shadow-sm">
+                      <div class="card-body p-0">
                           <div class="table-responsive">
-                              <table class="table table-hover">
-                                  <thead>
+                              <table class="table table-hover align-middle mb-0">
+                                  <thead class="bg-light">
                                       <tr>
-                                          <th>Vehicle ID</th>
-                                          <th>Driver</th>
-                                          <th>Maker</th>
-                                          <th>Model</th>
-                                          <th>Type</th>
-                                          <th>License Plate</th>
-                                          <th>Verification Status</th>
-                                          <th>Year</th>
-                                          <th>Actions</th>
+                                          <th class="ps-4 py-3">Vehicle ID</th>
+                                          <th class="py-3">Driver</th>
+                                          <th class="py-3">Maker</th>
+                                          <th class="py-3">Model</th>
+                                          <th class="py-3">Type</th>
+                                          <th class="py-3">License Plate</th>
+                                          <th class="py-3">Verification Status</th>
+                                          <th class="py-3">Year</th>
+                                          <th class="pe-4 py-3">Actions</th>
                                       </tr>
                                   </thead>
                                   <tbody>
                                       @foreach (var vehicle in Model.Vehicles)
                                       {
                                           <tr>
-                                              <td>@vehicle.Id</td>
+                                              <td class="ps-4">@vehicle.Id</td>
                                               <td>@vehicle.Driver?.FullName</td>
                                               <td>@vehicle.CarMaker</td>
                                               <td>@vehicle.Model</td>
                                               <td>@vehicle.VehicleType</td>
-                                              <td>@vehicle.LicensePlate</td>
-                                              <td>@vehicle.VerificationStatus</td>
+                                              <td><span class="font-monospace">@vehicle.LicensePlate</span></td>
+                                              <td><span class="badge @(vehicle.VerificationStatus == "Verified" ? "bg-success-subtle text-success-emphasis" : "bg-warning-subtle text-warning-emphasis") rounded-pill border border-0">@vehicle.VerificationStatus</span></td>
                                               <td>@vehicle.Year</td>
-                                              <td>
-                                                  <a asp-action="EditVehicle" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-secondary table-action-btn" title="Edit Vehicle"><i class="bi bi-pencil-fill"></i></a>
-                                                  <form asp-action="DeleteVehicle" asp-route-id="@vehicle.Id" method="post" class="d-inline">
-                                                      <button type="submit" class="btn btn-sm btn-outline-danger table-action-btn" title="Delete Vehicle" onclick="return confirm('Are you sure you want to delete this vehicle?');"><i class="bi bi-slash-circle-fill"></i></button>
-                                                  </form>
+                                              <td class="pe-4">
+                                                  <div class="btn-group btn-group-sm">
+                                                      <a asp-action="EditVehicle" asp-route-id="@vehicle.Id" class="btn btn-outline-secondary" title="Edit Vehicle"><i class="bi bi-pencil-fill"></i></a>
+                                                      <form asp-action="DeleteVehicle" asp-route-id="@vehicle.Id" method="post" class="d-inline">
+                                                          <button type="submit" class="btn btn-outline-danger ms-1" title="Delete Vehicle" onclick="return confirm('Are you sure you want to delete this vehicle?');"><i class="bi bi-trash-fill"></i></button>
+                                                      </form>
+                                                  </div>
                                               </td>
                                           </tr>
                                       }
@@ -295,68 +320,246 @@
               </div>
 
               <div class="tab-pane fade" id="rides-tab-pane" role="tabpanel" tabindex="0">
-                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                                <h1 class="h2">Ride Management</h1>
-                            </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="row mb-3 g-3">
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Search by Ride ID, User...">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <select class="form-select">
-                                                <option selected>Filter by Status...</option>
-                                                <option value="1">Ongoing</option>
-                                                <option value="2">Completed</option>
-                                                <option value="3">Cancelled</option>
-                                            </select>
-                                        </div>
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                        <h1 class="h2">Ride Management</h1>
+                    </div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-0">
+                            <div class="p-3 border-bottom bg-light">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" placeholder="Search by Ride ID, User...">
                                     </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ride ID</th>
-                                                    <th>Route</th>
-                                                    <th>Driver</th>
-                                                    <th>Rider(s)</th>
-                                                    <th>Date & Time</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (var ride in Model.Rides)
-                                                {
-                                                    var riders = Model.RideBookings
-                                                        .Where(rb => rb.RideId == ride.Id)
-                                                        .Select(rb => rb.User.UserProfile != null ? rb.User.UserProfile.FullName : rb.User.Email)
-                                                        .ToList();
-                                                    <tr>
-                                                        <td>@ride.Id</td>
-                                                        <td>@ride.Origin <i class="bi bi-arrow-right"></i> @ride.Destination</td>
-                                                        <td>@ride.Driver?.FullName</td>
-                                                        <td>@(riders.Any() ? string.Join(", ", riders) : "N/A")</td>
-                                                        <td>@ride.DepartureTime.ToString("yyyy-MM-dd, HH:mm")</td>
-                                                        <td><span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">@ride.Status</span></td>
-                                                        <td>
-                                                            <a asp-controller="AdminDashboard" asp-action="RideDetails" asp-route-id="@ride.Id" class="btn btn-sm btn-outline-info table-action-btn" title="View Details"><i class="bi bi-eye-fill"></i></a>
-                                                            <form asp-controller="AdminDashboard" asp-action="CancelRide" asp-route-id="@ride.Id" method="post" class="d-inline">
-                                                                @Html.AntiForgeryToken()
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger table-action-btn" title="Cancel Ride" onclick="return confirm('Are you sure you want to cancel this ride?');"><i class="bi bi-x-circle-fill"></i></button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
+                                    <div class="col-md-3">
+                                        <select class="form-select">
+                                            <option selected>Filter by Status...</option>
+                                            <option value="1">Ongoing</option>
+                                            <option value="2">Completed</option>
+                                            <option value="3">Cancelled</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4 py-3">Ride ID</th>
+                                            <th class="py-3">Route</th>
+                                            <th class="py-3">Driver</th>
+                                            <th class="py-3">Rider(s)</th>
+                                            <th class="py-3">Date & Time</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="pe-4 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var ride in Model.Rides)
+                                        {
+                                            var riders = Model.RideBookings
+                                                .Where(rb => rb.RideId == ride.Id)
+                                                .Select(rb => rb.User.UserProfile != null ? rb.User.UserProfile.FullName : rb.User.Email)
+                                                .ToList();
+                                            <tr>
+                                                <td class="ps-4">@ride.Id</td>
+                                                <td>@ride.Origin <i class="bi bi-arrow-right mx-1 text-muted"></i> @ride.Destination</td>
+                                                <td>@ride.Driver?.FullName</td>
+                                                <td>@(riders.Any() ? string.Join(", ", riders) : "N/A")</td>
+                                                <td>@ride.DepartureTime.ToString("MMM dd, yyyy HH:mm")</td>
+                                                <td><span class="badge @(ride.Status == "Completed" ? "bg-success-subtle text-success-emphasis" : (ride.Status == "Cancelled" ? "bg-danger-subtle text-danger-emphasis" : "bg-primary-subtle text-primary-emphasis")) rounded-pill border border-0">@ride.Status</span></td>
+                                                <td class="pe-4">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a asp-controller="AdminDashboard" asp-action="RideDetails" asp-route-id="@ride.Id" class="btn btn-outline-info" title="View Details"><i class="bi bi-eye-fill"></i></a>
+                                                        <form asp-controller="AdminDashboard" asp-action="CancelRide" asp-route-id="@ride.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-outline-danger ms-1" title="Cancel Ride" onclick="return confirm('Are you sure you want to cancel this ride?');"><i class="bi bi-x-circle-fill"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+                    </div>
+                    </div>
+                </div>
 
+                <div class="tab-pane fade" id="reports-tab-pane" role="tabpanel" tabindex="0">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                        <h1 class="h2">Reports & Complaints</h1>
+                    </div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4 py-3">Report ID</th>
+                                            <th class="py-3">Reporter</th>
+                                            <th class="py-3">Reported User</th>
+                                            <th class="py-3">Reason</th>
+                                            <th class="py-3">Date</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="pe-4 py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var report in Model.Reports)
+                                        {
+                                            <tr>
+                                                <td class="ps-4">@report.Id</td>
+                                                <td>@report.ReportingUser?.Email</td>
+                                                <td>@report.ReportedUser?.Email</td>
+                                                <td>@report.Description</td>
+                                                <td>@report.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                                <td><span class="badge @(report.Status == "Resolved" ? "bg-success-subtle text-success-emphasis" : "bg-warning-subtle text-warning-emphasis") rounded-pill border border-0">@report.Status</span></td>
+                                                <td class="pe-4">
+                                                    <button class="btn btn-sm btn-outline-primary" title="View Details"><i class="bi bi-eye-fill"></i></button>
+                                                    @if (report.Status != "Resolved")
+                                                    {
+                                                        <button class="btn btn-sm btn-outline-success ms-1" title="Mark Resolved"><i class="bi bi-check-lg"></i></button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="tab-pane fade" id="financials-tab-pane" role="tabpanel" tabindex="0">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                        <h1 class="h2">Financials</h1>
+                    </div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">Total Revenue</h5>
+                                        <i class="bi bi-wallet2 fs-4 opacity-50"></i>
+                                    </div>
+                                    <h2 class="display-6 fw-bold mb-0">₹@Model.TotalRevenue.ToString("N2")</h2>
+                                    <p class="mb-0 opacity-75 mt-2">Lifetime earnings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100 bg-success text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">Platform Commission</h5>
+                                        <i class="bi bi-percent fs-4 opacity-50"></i>
+                                    </div>
+                                    <h2 class="display-6 fw-bold mb-0">₹@(Model.TotalRevenue * 0.1m)</h2>
+                                    <p class="mb-0 opacity-75 mt-2">Estimated commission (10%)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title mb-0">Recent Transactions</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4 py-3">Transaction ID</th>
+                                            <th class="py-3">User</th>
+                                            <th class="py-3">Amount</th>
+                                            <th class="py-3">Date</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="pe-4 py-3">Method</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var payment in Model.Payments)
+                                        {
+                                            <tr>
+                                                <td class="ps-4 font-monospace">@(payment.ProviderTransactionId ?? payment.Id.ToString())</td>
+                                                <td>@payment.UserId</td> <!-- Ideally show User Name if available -->
+                                                <td class="fw-bold">₹@payment.Amount</td>
+                                                <td>@payment.PaymentDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                                <td><span class="badge @(payment.Status == "Completed" ? "bg-success-subtle text-success-emphasis" : "bg-warning-subtle text-warning-emphasis") rounded-pill border border-0">@payment.Status</span></td>
+                                                <td class="pe-4">@payment.PaymentMode</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="config-tab-pane" role="tabpanel" tabindex="0">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                        <h1 class="h2">System Configuration</h1>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title mb-0">General Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">Commission Rate (%)</label>
+                                            <input type="number" class="form-control" value="@Model.SystemConfig.CommissionRate" step="0.1">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Support Email</label>
+                                            <input type="email" class="form-control" value="@Model.SystemConfig.SupportEmail">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Support Phone</label>
+                                            <input type="text" class="form-control" value="@Model.SystemConfig.SupportPhone">
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="maintenanceMode" @(Model.SystemConfig.MaintenanceMode ? "checked" : "")>
+                                            <label class="form-check-label" for="maintenanceMode">Maintenance Mode</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title mb-0">System Health</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            Database Status
+                                            <span class="badge bg-success rounded-pill">Connected</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            Server Uptime
+                                            <span class="text-muted">99.9%</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            Last Backup
+                                            <span class="text-muted">@DateTime.Now.AddHours(-2).ToString("MMM dd, HH:mm")</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            Version
+                                            <span class="text-muted">v1.2.0</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                     </div>
                 </div>
     </main>
