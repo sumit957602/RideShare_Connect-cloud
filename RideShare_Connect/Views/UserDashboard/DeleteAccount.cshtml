@@ -21,12 +21,24 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/Home">Home</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="/UserDashboard/User">Dashboard</a>
                     </li>
                 </ul>
+                <div class="dropdown ms-lg-3">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="@(ViewBag.UserProfile?.ProfilePicture)" alt="Profile" width="32" height="32" class="rounded-circle me-2">
+                        <strong>@(ViewBag.UserProfile?.FullName ?? "User")</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="/UserDashboard/UserProfile">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item">Sign out</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -58,7 +70,7 @@
 
                                     <div class="mb-4">
                                         <label asp-for="Password" class="form-label">Your Password</label>
-                                        <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
+                                        <input asp-for="Password" class="form-control" type="password" placeholder="        " />
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
 

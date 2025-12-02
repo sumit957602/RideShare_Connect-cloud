@@ -197,13 +197,17 @@ namespace RideShare_Connect.Controllers
             return View(profile);
         }
 
-        public IActionResult DeleteAccount()
+        public async Task<IActionResult> DeleteAccount()
         {
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
             {
                 return RedirectToAction("Login", "UserAccount");
             }
+
+            var userProfile = await _db.UserProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
+            ViewBag.UserProfile = userProfile;
+
             return View(new DeleteAccountDto());
         }
 
