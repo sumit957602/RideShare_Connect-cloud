@@ -20,5 +20,6 @@ namespace RideShare_Connect.ViewModels
         public int CancelledRidesCount { get; set; }
         public int CompletedRidesCount { get; set; }
         public int TotalBookingsCount { get; set; }
+        public Dictionary<int, int> RideRatings { get; set; } = new();
     }
 }

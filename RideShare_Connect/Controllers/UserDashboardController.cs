@@ -84,6 +84,13 @@ namespace RideShare_Connect.Controllers
             var completedRidesCount = bookings.Count(b => b.Status == "Completed");
             var totalBookingsCount = bookings.Count;
 
+            var rideIds = bookings.Select(b => b.RideId).Distinct().ToList();
+            var rideRatings = _db.DriverRatings
+                .Where(r => r.PassengerId == userId && rideIds.Contains(r.RideId))
+                .AsEnumerable() // Switch to client-side evaluation for GroupBy if needed, or just to be safe with complex queries
+                .GroupBy(r => r.RideId)
+                .ToDictionary(g => g.Key, g => g.First().Rating);
+
             var model = new UserDashboardViewModel
             {
                 Profile = profile,
@@ -98,7 +105,8 @@ namespace RideShare_Connect.Controllers
                 ActiveRidesCount = activeRidesCount,
                 CancelledRidesCount = cancelledRidesCount,
                 CompletedRidesCount = completedRidesCount,
-                TotalBookingsCount = totalBookingsCount
+                TotalBookingsCount = totalBookingsCount,
+                RideRatings = rideRatings
             };
 
             return View(model);

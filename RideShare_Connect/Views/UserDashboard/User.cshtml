@@ -461,14 +461,33 @@
                                                     <td>@((booking.BookedSeats * booking.Ride.PricePerSeat * booking.DistanceKm).ToString("C"))</td>
                                                     <td>@booking.Status</td>
                                                     <td>
-                                                        <a asp-controller="Review"
-                                                           asp-action="Review"
-                                                           asp-route-rideId="@booking.Ride.Id"
-                                                           asp-route-driverId="@booking.Ride.DriverId"
-                                                           class="btn btn-sm btn-outline-primary">
-                                                            Give a review
-                                                        </a>
-
+                                                        @if (Model.RideRatings != null && Model.RideRatings.ContainsKey(booking.Ride.Id))
+                                                        {
+                                                            var rating = Model.RideRatings[booking.Ride.Id];
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="text-warning">
+                                                                    @for(int i=0; i<rating; i++) { <i class="bi bi-star-fill"></i> }
+                                                                    @for(int i=rating; i<5; i++) { <i class="bi bi-star"></i> }
+                                                                </span>
+                                                                <a asp-controller="Review"
+                                                                   asp-action="Review"
+                                                                   asp-route-rideId="@booking.Ride.Id"
+                                                                   asp-route-driverId="@booking.Ride.DriverId"
+                                                                   class="btn btn-sm btn-outline-secondary">
+                                                                    Edit Review
+                                                                </a>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a asp-controller="Review"
+                                                               asp-action="Review"
+                                                               asp-route-rideId="@booking.Ride.Id"
+                                                               asp-route-driverId="@booking.Ride.DriverId"
+                                                               class="btn btn-sm btn-outline-primary">
+                                                                Give a review
+                                                            </a>
+                                                        }
                                                     </td>
                                                 </tr>
                                             }
@@ -553,13 +572,33 @@
                                                             }
                                                             else if (booking.Status == "Completed")
                                                             {
-                                                                <a asp-controller="Review"
-                                                                   asp-action="Review"
-                                                                   asp-route-rideId="@booking.Ride.Id"
-                                                                   asp-route-driverId="@booking.Ride.DriverId"
-                                                                   class="btn btn-sm btn-outline-primary">
-                                                                    Review
-                                                                </a>
+                                                                @if (Model.RideRatings != null && Model.RideRatings.ContainsKey(booking.Ride.Id))
+                                                                {
+                                                                    var rating = Model.RideRatings[booking.Ride.Id];
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <span class="text-warning">
+                                                                            @for(int i=0; i<rating; i++) { <i class="bi bi-star-fill"></i> }
+                                                                            @for(int i=rating; i<5; i++) { <i class="bi bi-star"></i> }
+                                                                        </span>
+                                                                        <a asp-controller="Review"
+                                                                           asp-action="Review"
+                                                                           asp-route-rideId="@booking.Ride.Id"
+                                                                           asp-route-driverId="@booking.Ride.DriverId"
+                                                                           class="btn btn-sm btn-outline-secondary">
+                                                                            Edit Review
+                                                                        </a>
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a asp-controller="Review"
+                                                                       asp-action="Review"
+                                                                       asp-route-rideId="@booking.Ride.Id"
+                                                                       asp-route-driverId="@booking.Ride.DriverId"
+                                                                       class="btn btn-sm btn-outline-primary">
+                                                                        Give a review
+                                                                    </a>
+                                                                }
                                                             }
                                                             else
                                                             {

@@ -32,6 +32,9 @@ namespace RideShare_Connect.Controllers
 
             if (ride == null) return NotFound();
 
+            var existingRating = await _db.DriverRatings
+                .FirstOrDefaultAsync(r => r.RideId == rideId && r.DriverId == driverId && r.PassengerId == int.Parse(userId));
+
             var vm = new SubmitDriverRatingVm
             {
                 RideId = rideId,
@@ -39,7 +42,9 @@ namespace RideShare_Connect.Controllers
                 DriverName = ride.Driver.FullName,
                 From = ride.Origin,
                 To = ride.Destination,
-                DepartureTime = ride.DepartureTime
+                DepartureTime = ride.DepartureTime,
+                Rating = existingRating?.Rating ?? 0,
+                Review = existingRating?.Review
             };
 
             return View("Review", vm);
@@ -58,17 +63,30 @@ namespace RideShare_Connect.Controllers
 
             try
             {
-                var rating = new DriverRating
-                {
-                    RideId = vm.RideId,
-                    DriverId = vm.DriverId,
-                    PassengerId = userId,
-                    Rating = vm.Rating,
-                    Review = vm.Review?.Trim(),
-                    Timestamp = DateTime.UtcNow
-                };
+                var existingRating = await _db.DriverRatings
+                    .FirstOrDefaultAsync(r => r.RideId == vm.RideId && r.DriverId == vm.DriverId && r.PassengerId == userId);
 
-                _db.DriverRatings.Add(rating);
+                if (existingRating != null)
+                {
+                    existingRating.Rating = vm.Rating;
+                    existingRating.Review = vm.Review?.Trim();
+                    existingRating.Timestamp = DateTime.UtcNow;
+                    _db.DriverRatings.Update(existingRating);
+                }
+                else
+                {
+                    var rating = new DriverRating
+                    {
+                        RideId = vm.RideId,
+                        DriverId = vm.DriverId,
+                        PassengerId = userId,
+                        Rating = vm.Rating,
+                        Review = vm.Review?.Trim(),
+                        Timestamp = DateTime.UtcNow
+                    };
+                    _db.DriverRatings.Add(rating);
+                }
+
                 await _db.SaveChangesAsync();
 
                 TempData["Toast"] = "Thanks for your review!";
