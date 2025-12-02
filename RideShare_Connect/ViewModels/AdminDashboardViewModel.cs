@@ -15,6 +15,9 @@ namespace RideShare_Connect.ViewModels
         public int RidesCompleted { get; set; }
         public int OpenReports { get; set; }
 
+        public string AdminName { get; set; }
+        public string AdminProfilePicUrl { get; set; }
+
         public List<User> Users { get; set; } = new();
         public List<Driver> Drivers { get; set; } = new();
         public List<Vehicle> Vehicles { get; set; } = new();
@@ -25,6 +28,11 @@ namespace RideShare_Connect.ViewModels
         public List<UserReport> Reports { get; set; } = new();
         public List<Payment> Payments { get; set; } = new();
         public SystemConfigViewModel SystemConfig { get; set; } = new();
+
+        // Chart Data
+        public List<string> ChartLabels { get; set; } = new();
+        public List<int> UserGrowthData { get; set; } = new();
+        public List<decimal> RevenueData { get; set; } = new();
     }
 
     public class SystemConfigViewModel

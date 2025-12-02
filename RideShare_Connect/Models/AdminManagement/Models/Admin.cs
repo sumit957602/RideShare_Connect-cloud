@@ -23,5 +23,10 @@ namespace RideShare_Connect.Models.AdminManagement
         [Required]
         [StringLength(20)]
         public string Status { get; set; }  // e.g., Active, Inactive, Suspended
+
+        [StringLength(100)]
+        public string FullName { get; set; }
+
+        public string ProfilePicUrl { get; set; }
     }
 }

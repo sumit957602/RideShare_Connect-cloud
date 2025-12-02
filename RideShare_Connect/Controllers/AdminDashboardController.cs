@@ -43,8 +43,13 @@ namespace RideShare_Connect.Controllers
                 _db.SaveChanges();
             }
 
+            var adminId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var admin = _db.Admins.FirstOrDefault(a => a.Id == adminId);
+
             var viewModel = new AdminDashboardViewModel
             {
+                AdminName = !string.IsNullOrEmpty(admin?.FullName) ? admin.FullName : admin?.Username,
+                AdminProfilePicUrl = !string.IsNullOrEmpty(admin?.ProfilePicUrl) ? admin.ProfilePicUrl : "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
                 TotalRevenue = _db.Payments.Where(p => p.Status == "Completed").Sum(p => (decimal?)p.Amount) ?? 0,
                 PlatformWalletBalance = platformWallet.Balance,
                 TotalUsers = _db.Users.Count(),
@@ -62,6 +67,34 @@ namespace RideShare_Connect.Controllers
                 Payments = _db.Payments.OrderByDescending(p => p.PaymentDate).Take(50).ToList(),
                 SystemConfig = new SystemConfigViewModel() // Placeholder for now
             };
+
+            // Prepare Chart Data (Last 7 Months)
+            var chartLabels = new List<string>();
+            var userGrowthData = new List<int>();
+            var revenueData = new List<decimal>();
+
+            for (int i = 6; i >= 0; i--)
+            {
+                var date = DateTime.UtcNow.AddMonths(-i);
+                var monthStart = new DateTime(date.Year, date.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+                var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+
+                chartLabels.Add(date.ToString("MMM"));
+
+                // User Growth
+                var userCount = _db.Users.Count(u => u.CreatedAt >= monthStart && u.CreatedAt <= monthEnd);
+                userGrowthData.Add(userCount);
+
+                // Revenue
+                var revenue = _db.Payments
+                    .Where(p => p.Status == "Completed" && p.PaymentDate >= monthStart && p.PaymentDate <= monthEnd)
+                    .Sum(p => (decimal?)p.Amount) ?? 0;
+                revenueData.Add(revenue);
+            }
+
+            viewModel.ChartLabels = chartLabels;
+            viewModel.UserGrowthData = userGrowthData;
+            viewModel.RevenueData = revenueData;
 
             return View(viewModel);
         }

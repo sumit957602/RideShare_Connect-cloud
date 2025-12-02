@@ -1,0 +1,88 @@
+@model RideShare_Connect.ViewModels.AdminSettingsViewModel
+@{
+    ViewData["Title"] = "Account Settings";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0">Account Settings</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <!-- Profile Settings Form -->
+                    <form asp-action="UpdateProfile" method="post">
+                        <div class="mb-4 text-center">
+                            @if (!string.IsNullOrEmpty(Model.Profile.ExistingProfilePicUrl))
+                            {
+                                <img src="@Model.Profile.ExistingProfilePicUrl" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <img src="https://via.placeholder.com/150" alt="Default Profile" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            }
+                            <div class="mb-3 text-start">
+                                <label asp-for="Profile.ProfilePicUrl" class="form-label">Profile Picture URL</label>
+                                <input asp-for="Profile.ProfilePicUrl" class="form-control" placeholder="https://example.com/image.jpg">
+                                <span asp-validation-for="Profile.ProfilePicUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Profile.FullName" class="form-label">Full Name</label>
+                            <input asp-for="Profile.FullName" class="form-control">
+                            <span asp-validation-for="Profile.FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-5">
+
+                    <!-- Change Password Form -->
+                    <h5 class="mb-3">Change Password</h5>
+                    <form asp-action="ChangePassword" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Password.CurrentPassword" class="form-label">Current Password</label>
+                            <input asp-for="Password.CurrentPassword" class="form-control">
+                            <span asp-validation-for="Password.CurrentPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Password.NewPassword" class="form-label">New Password</label>
+                                <input asp-for="Password.NewPassword" class="form-control">
+                                <span asp-validation-for="Password.NewPassword" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Password.ConfirmNewPassword" class="form-label">Confirm New Password</label>
+                                <input asp-for="Password.ConfirmNewPassword" class="form-control">
+                                <span asp-validation-for="Password.ConfirmNewPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-controller="AdminDashboard" asp-action="Admin" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-warning text-white">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
