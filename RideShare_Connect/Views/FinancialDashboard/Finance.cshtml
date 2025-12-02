@@ -210,14 +210,31 @@
                             <div class="card mb-4">
                                 <div class="card-body">
                                     <h5 class="card-title mb-3">Request a Refund</h5>
-                                    <form>
+                                    @if (TempData["SuccessMessage"] != null)
+                                    {
+                                        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                                    }
+                                    @if (TempData["ErrorMessage"] != null)
+                                    {
+                                        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                                    }
+                                    <form asp-action="SubmitRefundRequest" method="post">
                                         <div class="mb-3">
-                                            <label for="refundRideId" class="form-label">Ride/Transaction ID</label>
-                                            <input type="text" class="form-control" id="refundRideId" placeholder="Enter the ID of the transaction">
+                                            <label for="refundRideId" class="form-label">Select the Ride/Transaction ID</label>
+                                            <select class="form-select" id="refundRideId" name="rideId" required>
+                                                <option selected disabled value="">Select a completed ride...</option>
+                                                @if (Model.CompletedRides != null)
+                                                {
+                                                    foreach (var ride in Model.CompletedRides)
+                                                    {
+                                                        <option value="@ride.Id">Ride #@ride.Id - @ride.Ride.Origin to @ride.Ride.Destination (@ride.BookingTime.ToString("dd MMM yyyy")) - ₹@((ride.Ride.PricePerSeat * ride.BookedSeats * ride.DistanceKm).ToString("F2"))</option>
+                                                    }
+                                                }
+                                            </select>
                                         </div>
                                         <div class="mb-3">
                                             <label for="refundReason" class="form-label">Reason for Refund</label>
-                                            <textarea class="form-control" id="refundReason" rows="3" placeholder="Please explain why you are requesting a refund..."></textarea>
+                                            <textarea class="form-control" id="refundReason" name="reason" rows="3" placeholder="Please explain why you are requesting a refund..." required></textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary">Submit Request</button>
                                     </form>
@@ -227,11 +244,53 @@
                                 <div class="card-body">
                                     <h5 class="card-title mb-3">Your Refund Status</h5>
                                     <div class="table-responsive">
-                                        <table class="table">
-                                            <thead><tr><th>Request ID</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+                                        <table class="table align-middle">
+                                            <thead><tr><th>Request ID</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
                                             <tbody>
-                                                <tr><td>REF5678</td><td>2025-07-23</td><td>₹100.00</td><td><span class="badge bg-success-subtle text-success-emphasis rounded-pill">Completed</span></td></tr>
-                                                <tr><td>REF5679</td><td>2025-07-26</td><td>₹50.00</td><td><span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Processing</span></td></tr>
+                                                @if (Model.Refunds != null && Model.Refunds.Any())
+                                                {
+                                                    foreach (var refund in Model.Refunds)
+                                                    {
+                                                        <tr>
+                                                            <td>REF@(refund.Id + 1000)</td>
+                                                            <td>@refund.ProcessedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                                            <td>₹@refund.Amount.ToString("F2")</td>
+                                                            <td>
+                                                                @if (refund.RefundStatus == "Completed")
+                                                                {
+                                                                    <span class="badge bg-success-subtle text-success-emphasis rounded-pill">Completed</span>
+                                                                }
+                                                                else if (refund.RefundStatus == "Processing")
+                                                                {
+                                                                    <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Processing</span>
+                                                                }
+                                                                else if (refund.RefundStatus == "Cancelled")
+                                                                {
+                                                                    <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Cancelled</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill">@refund.RefundStatus</span>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex gap-2">
+                                                                    <a asp-action="RefundDetails" asp-route-id="@refund.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                                                    @if (refund.RefundStatus == "Processing")
+                                                                    {
+                                                                        <form asp-action="CancelRefundRequest" asp-route-id="@refund.Id" method="post" onsubmit="return confirm('Are you sure you want to cancel this request?');" style="display:inline;">
+                                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                                        </form>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr><td colspan="5" class="text-center text-muted">No refund requests found.</td></tr>
+                                                }
                                             </tbody>
                                         </table>
                                     </div>

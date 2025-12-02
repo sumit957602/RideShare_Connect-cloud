@@ -1,0 +1,120 @@
+@model RideShare_Connect.Models.PaymentManagement.Refund
+
+@{
+    ViewData["Title"] = "Refund Details";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/finance.css" asp-append-version="true" />
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="#">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="UserDashboard" asp-action="User">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="FinancialDashboard" asp-action="Finance">Payments & Finance</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Refund Request Details</h4>
+                                <span class="badge @(Model.RefundStatus == "Completed" ? "bg-success" : (Model.RefundStatus == "Processing" ? "bg-warning text-dark" : "bg-secondary")) rounded-pill fs-6">
+                                    @Model.RefundStatus
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Request ID</h6>
+                                    <p class="fs-5 fw-bold">REF@(Model.Id + 1000)</p>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <h6 class="text-muted">Requested On</h6>
+                                    <p class="fs-5">@Model.ProcessedAt.ToString("MMM dd, yyyy hh:mm tt")</p>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="mb-4">
+                                <h5 class="mb-3">Refund Information</h5>
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <label class="text-muted small">Amount Requested</label>
+                                        <p class="fw-bold">₹@Model.Amount.ToString("F2")</p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="text-muted small">Reason</label>
+                                        <p>@Model.Reason</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5 class="mb-3">Associated Ride Details</h5>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <small class="text-muted d-block">Origin</small>
+                                                <strong>@Model.Payment.Booking.Ride.Origin</strong>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <small class="text-muted d-block">Destination</small>
+                                                <strong>@Model.Payment.Booking.Ride.Destination</strong>
+                                            </div>
+                                            <div class="col-12 mt-3">
+                                                <small class="text-muted d-block">Ride Date</small>
+                                                <span>@Model.Payment.Booking.Ride.DepartureTime.ToString("MMM dd, yyyy hh:mm tt")</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-5">
+                                <a asp-action="Finance" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to Finance
+                                </a>
+                                
+                                @if (Model.RefundStatus == "Processing")
+                                {
+                                    <form asp-action="CancelRefundRequest" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Are you sure you want to cancel this refund request?');">
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="bi bi-x-circle me-2"></i>Cancel Request
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>

@@ -65,6 +65,18 @@ namespace RideShare_Connect.Controllers
             var recentTransactions = await walletTransactionsQuery.Take(3).ToListAsync();
 
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            
+            var completedRides = await _db.RideBookings
+                .Include(b => b.Ride)
+                .Where(b => b.PassengerId == userId && b.Status == "Completed")
+                .OrderByDescending(b => b.BookingTime)
+                .ToListAsync();
+
+            var refunds = await _db.Refunds
+                .Include(r => r.Payment)
+                .Where(r => r.Payment.UserId == userId)
+                .OrderByDescending(r => r.ProcessedAt)
+                .ToListAsync();
 
             var model = new FinanceViewModel
             {
@@ -76,7 +88,9 @@ namespace RideShare_Connect.Controllers
                 RecentTransactions = recentTransactions,
                 Profile = profile,
                 CurrentPage = page,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                CompletedRides = completedRides,
+                Refunds = refunds
             };
 
             ViewBag.RazorpayKey = _config["PaymentGateway:ApiKey"];
@@ -361,6 +375,120 @@ namespace RideShare_Connect.Controllers
         public IActionResult PaymentHistory()
         {
             return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitRefundRequest(int rideId, string reason)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var booking = await _db.RideBookings
+                .Include(b => b.Ride)
+                .FirstOrDefaultAsync(b => b.Id == rideId && b.PassengerId == userId);
+
+            if (booking == null)
+            {
+                return NotFound("Ride booking not found.");
+            }
+
+            var payment = await _db.Payments.FirstOrDefaultAsync(p => p.BookingId == booking.Id);
+            if (payment == null)
+            {
+                // Fallback: if no payment record exists (e.g. cash), we might not be able to process a refund via this table
+                // But for now, let's assume payment exists or create a dummy one? 
+                // Better to return error.
+                return BadRequest("No payment record found for this ride.");
+            }
+
+            // Check if there is any active refund request (Processing or Completed)
+            var existingRefund = await _db.Refunds.AnyAsync(r => r.PaymentId == payment.Id && r.RefundStatus != "Cancelled");
+            if (existingRefund)
+            {
+                TempData["ErrorMessage"] = "A refund request for this ride already exists.";
+                return RedirectToAction(nameof(Finance));
+            }
+
+            var refund = new Refund
+            {
+                PaymentId = payment.Id,
+                Amount = payment.Amount, // Full refund request? Or calculate? User didn't specify amount input.
+                Reason = reason,
+                RefundStatus = "Processing",
+                ProcessedAt = DateTime.UtcNow
+            };
+
+            _db.Refunds.Add(refund);
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Refund request submitted successfully.";
+            return RedirectToAction(nameof(Finance));
+        }
+
+        public async Task<IActionResult> RefundDetails(int id)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var refund = await _db.Refunds
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.Booking)
+                        .ThenInclude(b => b.Ride)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (refund == null || refund.Payment.UserId != userId)
+            {
+                return NotFound();
+            }
+
+            return View(refund);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelRefundRequest(int id)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var refund = await _db.Refunds
+                .Include(r => r.Payment)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (refund == null || refund.Payment.UserId != userId)
+            {
+                return NotFound();
+            }
+
+            if (refund.RefundStatus != "Processing")
+            {
+                TempData["ErrorMessage"] = "Cannot cancel this refund request as it is already processed.";
+                return RedirectToAction(nameof(Finance));
+            }
+
+            // Option 1: Delete the request
+            // _db.Refunds.Remove(refund);
+            
+            // Option 2: Set status to Cancelled (Better for history)
+            refund.RefundStatus = "Cancelled";
+            _db.Refunds.Update(refund);
+
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Refund request cancelled successfully.";
+            return RedirectToAction(nameof(Finance));
         }
     }
 }

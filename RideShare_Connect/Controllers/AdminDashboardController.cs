@@ -9,6 +9,7 @@ using RideShare_Connect.Models.UserManagement;
 using RideShare_Connect.Models.AdminManagement;
 using RideShare_Connect.DTOs;
 using RideShare_Connect.Models.RideManagement;
+using RideShare_Connect.Models.PaymentManagement;
 
 namespace RideShare_Connect.Controllers
 {
@@ -65,6 +66,7 @@ namespace RideShare_Connect.Controllers
                     .ToList(),
                 Reports = _db.UserReports.Include(r => r.ReportingUser).Include(r => r.ReportedUser).OrderByDescending(r => r.CreatedAt).ToList(),
                 Payments = _db.Payments.OrderByDescending(p => p.PaymentDate).Take(50).ToList(),
+                Refunds = _db.Refunds.Include(r => r.Payment).ThenInclude(p => p.User).ThenInclude(u => u.UserProfile).OrderByDescending(r => r.ProcessedAt).ToList(),
                 SystemConfig = new SystemConfigViewModel() // Placeholder for now
             };
 
@@ -450,6 +452,97 @@ namespace RideShare_Connect.Controllers
             ride.Status = "Cancelled";
             await _db.SaveChangesAsync();
 
+            return RedirectToAction("Admin");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveRefund(int id)
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var refund = await _db.Refunds.Include(r => r.Payment).FirstOrDefaultAsync(r => r.Id == id);
+            if (refund == null)
+            {
+                return NotFound();
+            }
+
+            if (refund.RefundStatus != "Processing")
+            {
+                TempData["ErrorMessage"] = "Refund request is not pending.";
+                return RedirectToAction("Admin");
+            }
+
+            // 1. Update Refund Status
+            refund.RefundStatus = "Completed";
+            _db.Refunds.Update(refund);
+
+            // 2. Refund to User Wallet
+            var userWallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == refund.Payment.UserId);
+            if (userWallet != null)
+            {
+                userWallet.Balance += refund.Amount;
+                _db.Wallets.Update(userWallet);
+
+                _db.WalletTransactions.Add(new WalletTransaction
+                {
+                    WalletId = userWallet.Id,
+                    Amount = refund.Amount,
+                    TxnType = "Credit",
+                    TxnDate = DateTime.UtcNow,
+                    Description = $"Refund Approved for Request REF{refund.Id + 1000}",
+                    TransactionId = Guid.NewGuid().ToString(),
+                    PaymentMethod = "Wallet",
+                    Status = "Completed"
+                });
+            }
+
+            await _db.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Refund approved and amount credited to user wallet.";
+            return RedirectToAction("Admin");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectRefund(int id, string reason)
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var refund = await _db.Refunds.FirstOrDefaultAsync(r => r.Id == id);
+            if (refund == null)
+            {
+                return NotFound();
+            }
+
+            if (refund.RefundStatus != "Processing")
+            {
+                TempData["ErrorMessage"] = "Refund request is not pending.";
+                return RedirectToAction("Admin");
+            }
+
+            refund.RefundStatus = "Rejected";
+            // Append rejection reason if provided? Or replace? 
+            // User asked to "reject with reason". I'll append it to the existing reason or just rely on status.
+            // The Refund model has a 'Reason' field which is the *request* reason.
+            // I should probably not overwrite the user's reason.
+            // But I don't have a 'RejectionReason' field.
+            // I'll append it to the Reason field for now: "User Reason... [Admin Rejected: Reason]"
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                refund.Reason += $" [Admin Rejected: {reason}]";
+            }
+
+            _db.Refunds.Update(refund);
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Refund request rejected.";
             return RedirectToAction("Admin");
         }
     }

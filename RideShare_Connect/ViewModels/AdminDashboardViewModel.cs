@@ -23,11 +23,11 @@ namespace RideShare_Connect.ViewModels
         public List<Vehicle> Vehicles { get; set; } = new();
 
         public List<Ride> Rides { get; set; } = new();
-        public List<RideBooking> RideBookings { get; set; } = new();
-
-        public List<UserReport> Reports { get; set; } = new();
-        public List<Payment> Payments { get; set; } = new();
-        public SystemConfigViewModel SystemConfig { get; set; } = new();
+        public List<RideBooking> RideBookings { get; set; }
+        public List<UserReport> Reports { get; set; }
+        public List<Payment> Payments { get; set; }
+        public List<RideShare_Connect.Models.PaymentManagement.Refund> Refunds { get; set; }
+        public SystemConfigViewModel SystemConfig { get; set; }
 
         // Chart Data
         public List<string> ChartLabels { get; set; } = new();

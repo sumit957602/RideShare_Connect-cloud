@@ -19,5 +19,11 @@ namespace RideShare_Connect.ViewModels
         // Pagination
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
+
+        // Eligible rides for refund
+        public List<RideShare_Connect.Models.RideManagement.RideBooking> CompletedRides { get; set; } = new();
+
+        // Refund History
+        public List<Refund> Refunds { get; set; } = new();
     }
 }
