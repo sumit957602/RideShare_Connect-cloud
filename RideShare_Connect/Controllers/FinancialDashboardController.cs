@@ -157,8 +157,18 @@ namespace RideShare_Connect.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddPaymentMethod()
+        public async Task<IActionResult> AddPaymentMethod()
         {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var userProfile = await _db.UserProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
+            ViewBag.UserProfile = userProfile;
+
             return View();
         }
 
@@ -213,6 +223,8 @@ namespace RideShare_Connect.Controllers
             var userId = int.Parse(userIdClaim);
 
             var method = await _db.PaymentMethods
+                .Include(pm => pm.User)
+                    .ThenInclude(u => u.UserProfile)
                 .FirstOrDefaultAsync(pm => pm.Id == id && pm.UserId == userId);
 
             if (method == null)
@@ -240,6 +252,8 @@ namespace RideShare_Connect.Controllers
             var userId = int.Parse(userIdClaim);
 
             var method = await _db.PaymentMethods
+                .Include(pm => pm.User)
+                    .ThenInclude(u => u.UserProfile)
                 .FirstOrDefaultAsync(pm => pm.Id == id && pm.UserId == userId);
 
             if (method == null)
