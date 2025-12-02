@@ -5,9 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function filterRides() {
         const from = document.getElementById('fromLocation').value.toLowerCase().trim();
         const to = document.getElementById('toLocation').value.toLowerCase().trim();
-        const radius = parseFloat(document.getElementById('radius').value);
         const date = document.getElementById('rideDate').value;
-        const time = document.getElementById('rideTime').value;
         const priceMin = parseFloat(document.getElementById('priceMin').value);
         const priceMax = parseFloat(document.getElementById('priceMax').value);
         const seats = parseInt(document.getElementById('rideSeats').value);
@@ -27,9 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (from && !origin.includes(from)) return false;
             if (to && !destination.includes(to)) return false;
-            if (!isNaN(radius) && distance > radius) return false;
             if (date && cardDate !== date) return false;
-            if (time && cardTime !== time) return false;
             if (!isNaN(priceMin) && price < priceMin) return false;
             if (!isNaN(priceMax) && price > priceMax) return false;
             if (!isNaN(seats) && cardSeats < seats) return false;

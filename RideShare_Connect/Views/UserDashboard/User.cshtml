@@ -90,17 +90,15 @@
                                 <i class="bi bi-bookmark-check-fill"></i>Total Bookings
                             </a>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#ratings-tab-pane" role="tab" aria-controls="ratings-tab-pane" aria-selected="false">
+                                <i class="bi bi-star-half"></i>My Ratings
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="../UserDashboard/UserProfile">
                                 <i class="bi bi-person-circle"></i>Profile
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="nav-link btn btn-link p-0">
-                                    <i class="bi bi-box-arrow-left"></i>Logout
-                                </button>
-                            </form>
                         </li>
                     </ul>
                 </div>
@@ -158,7 +156,7 @@
                                     </div>
                                     <div>
                                         <h5 class="mb-0">@Model.Rating.ToString("0.0")</h5>
-                                        <p class="text-muted mb-0">Your Rating</p>
+                                        <p class="text-muted mb-0">My Rating</p>
                                     </div>
                                 </div>
                             </div>
@@ -239,16 +237,8 @@
                                         <input type="text" class="form-control" id="toLocation" placeholder="e.g., Airport">
                                     </div>
                                     <div class="col-md-2">
-                                        <label for="radius" class="form-label">Radius (km)</label>
-                                        <input type="number" class="form-control" id="radius" min="1" placeholder="5">
-                                    </div>
-                                    <div class="col-md-2">
                                         <label for="rideDate" class="form-label">Date</label>
                                         <input type="date" class="form-control" id="rideDate">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="rideTime" class="form-label">Time</label>
-                                        <input type="time" class="form-control" id="rideTime">
                                     </div>
                                     <div class="col-md-2">
                                         <label for="priceMin" class="form-label">Min Price (₹)</label>
@@ -617,6 +607,54 @@
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Ratings Tab -->
+                    <div class="tab-pane fade" id="ratings-tab-pane" role="tabpanel" tabindex="0">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">My Ratings & Reviews</h1>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                @if (Model.ReceivedRatings != null && Model.ReceivedRatings.Any())
+                                {
+                                    <div class="list-group list-group-flush">
+                                        @foreach (var rating in Model.ReceivedRatings)
+                                        {
+                                            <div class="list-group-item">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h5 class="mb-1">Ride with @rating.Driver.FullName</h5>
+                                                    <small class="text-muted">@rating.Timestamp.ToString("dd MMM yyyy")</small>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <span class="text-warning">
+                                                        @for (int i = 0; i < rating.Rating; i++)
+                                                        {
+                                                            <i class="bi bi-star-fill"></i>
+                                                        }
+                                                        @for (int i = rating.Rating; i < 5; i++)
+                                                        {
+                                                            <i class="bi bi-star"></i>
+                                                        }
+                                                    </span>
+                                                    <span class="ms-2 fw-bold">@rating.Rating/5</span>
+                                                </div>
+                                                <p class="mb-1">@rating.Review</p>
+                                                <small class="text-muted">Route: @rating.Ride.Origin <i class="bi bi-arrow-right"></i> @rating.Ride.Destination</small>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-star fs-1 text-muted"></i>
+                                        <p class="mt-3 text-muted">No ratings received yet.</p>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ using RideShare_Connect.Models.VehicleManagement;
 using RideShare_Connect.ViewModels;
 using RideShare_Connect.DTOs;
 using RideShare_Connect.Models.PaymentManagement;
+using RideShare_Connect.Models.UserManagement;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 
@@ -100,6 +101,41 @@ namespace RideShare_Connect.Controllers
             var cancelledRidesCount = acceptedBookings.Count(b => b.Status == "Cancelled");
             var totalRidesCount = acceptedBookings.Count;
 
+            var bookingIds = acceptedBookings.Select(b => b.BookingId).Distinct().ToList();
+            var passengerRatings = _db.UserRatings
+                .Where(r => r.DriverId == userId && bookingIds.Contains(r.RideId)) // Note: Using RideId as BookingId reference might be tricky if not 1:1, but UserRating has RideId. 
+                                                                                   // Wait, UserRating has RideId, DriverId, PassengerId. 
+                                                                                   // We want to check if THIS driver has rated THIS passenger for THIS ride.
+                                                                                   // The booking list has RideId.
+                .AsEnumerable()
+                .GroupBy(r => r.RideId) // Assuming one rating per ride per passenger, but here we might have multiple passengers per ride. 
+                                        // Actually, we need to map by BookingId or (RideId, PassengerId).
+                                        // The view iterates over bookings. Each booking has a unique ID.
+                                        // Let's assume UserRating should probably link to BookingId to be precise, or we use (RideId, PassengerId) as key.
+                                        // But the ViewModel uses Dictionary<int, int>. If key is BookingId, that's best.
+                                        // However, UserRating currently has RideId. 
+                                        // Let's use BookingId as the key in the dictionary, but we need to match it.
+                                        // A booking is (RideId, PassengerId).
+                .ToDictionary(g => g.Key, g => g.First().Rating); 
+            
+            // Correction: The UserRating model I created has RideId, DriverId, PassengerId.
+            // The bookings list has BookingId, RideId, PassengerId.
+            // I should probably fetch all ratings for these rides/passengers and map them to BookingId.
+            
+            var relevantRatings = _db.UserRatings
+                .Where(r => r.DriverId == userId)
+                .ToList();
+
+            var passengerRatingsDict = new Dictionary<int, int>();
+            foreach(var booking in acceptedBookings)
+            {
+                var rating = relevantRatings.FirstOrDefault(r => r.RideId == booking.RideId && r.PassengerId == booking.PassengerId);
+                if (rating != null)
+                {
+                    passengerRatingsDict[booking.BookingId] = rating.Rating;
+                }
+            }
+
             var viewModel = new DriverDashboardViewModel
             {
                 Driver = driver,
@@ -116,7 +152,8 @@ namespace RideShare_Connect.Controllers
                 AcceptedRidesCount = acceptedRidesCount,
                 ActiveRidesCount = activeRidesCount,
                 CancelledRidesCount = cancelledRidesCount,
-                TotalRidesCount = totalRidesCount
+                TotalRidesCount = totalRidesCount,
+                PassengerRatings = passengerRatingsDict
             };
 
             return View(viewModel);
@@ -677,6 +714,89 @@ namespace RideShare_Connect.Controllers
 
             await _db.SaveChangesAsync();
 
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Driver));
+        }
+
+        [Authorize(Roles = "Driver")]
+        [HttpGet]
+        public async Task<IActionResult> RateUser(int bookingId)
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdValue) || !int.TryParse(userIdValue, out var userId))
+            {
+                return RedirectToAction("Login", "DriverAccount");
+            }
+
+            var booking = await _db.RideBookings
+                .Include(rb => rb.Ride)
+                .Include(rb => rb.User)
+                    .ThenInclude(u => u.UserProfile)
+                .FirstOrDefaultAsync(rb => rb.Id == bookingId && rb.Ride.DriverId == userId);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            var existingRating = await _db.UserRatings
+                .FirstOrDefaultAsync(r => r.RideId == booking.RideId && r.DriverId == userId && r.PassengerId == booking.PassengerId);
+
+            var vm = new SubmitUserRatingVm
+            {
+                BookingId = bookingId,
+                RideId = booking.RideId,
+                DriverId = userId,
+                PassengerId = booking.PassengerId,
+                PassengerName = booking.User.UserProfile?.FullName ?? booking.User.Email,
+                Rating = existingRating?.Rating ?? 0,
+                Review = existingRating?.Review
+            };
+
+            return View(vm);
+        }
+
+        [Authorize(Roles = "Driver")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RateUser(SubmitUserRatingVm vm)
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdValue) || !int.TryParse(userIdValue, out var userId))
+            {
+                return RedirectToAction("Login", "DriverAccount");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+
+            var existingRating = await _db.UserRatings
+                .FirstOrDefaultAsync(r => r.RideId == vm.RideId && r.DriverId == userId && r.PassengerId == vm.PassengerId);
+
+            if (existingRating != null)
+            {
+                existingRating.Rating = vm.Rating;
+                existingRating.Review = vm.Review;
+                existingRating.Timestamp = DateTime.UtcNow;
+                _db.UserRatings.Update(existingRating);
+            }
+            else
+            {
+                var rating = new UserRating
+                {
+                    RideId = vm.RideId,
+                    DriverId = userId,
+                    PassengerId = vm.PassengerId,
+                    Rating = vm.Rating,
+                    Review = vm.Review,
+                    Timestamp = DateTime.UtcNow
+                };
+                _db.UserRatings.Add(rating);
+            }
+
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Driver));
         }
     }

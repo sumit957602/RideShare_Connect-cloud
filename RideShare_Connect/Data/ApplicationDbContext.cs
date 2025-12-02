@@ -30,6 +30,7 @@ namespace RideShareConnect.Data
         public DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
         public DbSet<DocumentReminder> DocumentReminders { get; set; }
         public DbSet<DriverRating> DriverRatings { get; set; }
+        public DbSet<UserRating> UserRatings { get; set; }
         public DbSet<Driver> Driver { get; set; }
 
         public DbSet<Ride> Rides { get; set; }

@@ -53,8 +53,8 @@ namespace RideShare_Connect.Controllers
             var wallet = _db.Wallets.FirstOrDefault(w => w.UserId == userId);
             var walletBalance = wallet?.Balance ?? 0;
 
-            var rating = _db.DriverRatings
-                .Where(r => r.DriverId == userId)
+            var rating = _db.UserRatings
+                .Where(r => r.PassengerId == userId)
                 .Average(r => (double?)r.Rating) ?? 0;
 
             var availableRides = _db.Rides
@@ -91,6 +91,13 @@ namespace RideShare_Connect.Controllers
                 .GroupBy(r => r.RideId)
                 .ToDictionary(g => g.Key, g => g.First().Rating);
 
+            var receivedRatings = _db.UserRatings
+                .Include(r => r.Driver)
+                .Include(r => r.Ride)
+                .Where(r => r.PassengerId == userId)
+                .OrderByDescending(r => r.Timestamp)
+                .ToList();
+
             var model = new UserDashboardViewModel
             {
                 Profile = profile,
@@ -106,7 +113,8 @@ namespace RideShare_Connect.Controllers
                 CancelledRidesCount = cancelledRidesCount,
                 CompletedRidesCount = completedRidesCount,
                 TotalBookingsCount = totalBookingsCount,
-                RideRatings = rideRatings
+                RideRatings = rideRatings,
+                ReceivedRatings = receivedRatings
             };
 
             return View(model);

@@ -406,7 +406,7 @@
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table">
-                                            <thead><tr><th>Passenger ID</th><th>Route</th><th>Seats</th><th>Pickup</th><th>Drop</th><th>Total Fare</th><th>Status</th></tr></thead>
+                                            <thead><tr><th>Passenger ID</th><th>Route</th><th>Seats</th><th>Pickup</th><th>Drop</th><th>Total Fare</th><th>Status</th><th>Actions</th></tr></thead>
                                             <tbody>
                                                 @if (Model.AcceptedRideBookings.Any())
                                                 {
@@ -420,12 +420,39 @@
                                                             <td>@booking.DropLocation</td>
                                                             <td>@( (booking.BookedSeats * booking.PricePerSeat * booking.DistanceKm).ToString("C") )</td>
                                                             <td>@booking.Status</td>
+                                                            <td>
+                                                                @if (booking.Status == "Pending" || booking.Status == "Ongoing")
+                                                                {
+                                                                    <form asp-action="CancelRide" asp-route-id="@booking.BookingId" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this ride?');">
+                                                                        @Html.AntiForgeryToken()
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                                                    </form>
+                                                                }
+                                                                else if (booking.Status == "Completed")
+                                                                {
+                                                                    @if (Model.PassengerRatings != null && Model.PassengerRatings.ContainsKey(booking.BookingId))
+                                                                    {
+                                                                        var rating = Model.PassengerRatings[booking.BookingId];
+                                                                        <div class="d-flex align-items-center gap-2">
+                                                                            <span class="text-warning">
+                                                                                @for(int i=0; i<rating; i++) { <i class="bi bi-star-fill"></i> }
+                                                                                @for(int i=rating; i<5; i++) { <i class="bi bi-star"></i> }
+                                                                            </span>
+                                                                            <a asp-action="RateUser" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-secondary">Edit Rating</a>
+                                                                        </div>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <a asp-action="RateUser" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-primary">Rate User</a>
+                                                                    }
+                                                                }
+                                                            </td>
                                                         </tr>
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    <tr><td colspan="7">No rides found.</td></tr>
+                                                    <tr><td colspan="8">No rides found.</td></tr>
                                                 }
                                             </tbody>
                                         </table>

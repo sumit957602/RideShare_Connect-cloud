@@ -1,0 +1,117 @@
+@model RideShare_Connect.ViewModels.SubmitUserRatingVm
+@{
+    ViewData["Title"] = "Rate Passenger";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/driverCreateRide.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="#">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="DriverDashboard" asp-action="Driver">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <h2 class="fw-bold text-primary">Rate Passenger</h2>
+                                <p class="text-muted">How was your experience with @Model.PassengerName?</p>
+                            </div>
+
+                            <form asp-action="RateUser" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" asp-for="BookingId" />
+                                <input type="hidden" asp-for="RideId" />
+                                <input type="hidden" asp-for="DriverId" />
+                                <input type="hidden" asp-for="PassengerId" />
+                                <input type="hidden" asp-for="PassengerName" />
+
+                                <div class="mb-4 text-center">
+                                    <label class="form-label d-block mb-2">Rating</label>
+                                    <div class="rating-stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <input type="radio" asp-for="Rating" value="@i" id="star@(i)" class="d-none" />
+                                            <label for="star@(i)" class="bi bi-star fs-2 text-warning cursor-pointer" onclick="setRating(@i)"></label>
+                                        }
+                                    </div>
+                                    <span asp-validation-for="Rating" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Review" class="form-label">Review (Optional)</label>
+                                    <textarea asp-for="Review" class="form-control" rows="4" placeholder="Share your feedback..."></textarea>
+                                    <span asp-validation-for="Review" class="text-danger"></span>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">Submit Rating</button>
+                                    <a asp-action="Driver" class="btn btn-outline-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4"><h5><i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect</h5><p>Your trusted platform for safe, comfortable, and affordable shared rides.</p></div>
+                <div class="col-lg-2 col-md-4 col-6"><h5>Quick Links</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">About Us</a></li><li class="mb-2"><a href="#">Contact</a></li></ul></div>
+                <div class="col-lg-3 col-md-4 col-6"><h5>Legal</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">Privacy Policy</a></li><li class="mb-2"><a href="#">Terms of Service</a></li></ul></div>
+                <div class="col-lg-3 col-md-4"><h5>Contact Us</h5><ul class="list-unstyled"><li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Connect Ave, Patna</li><li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contact@rideshareconnect.com</li></ul></div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);"><div class="text-center"><p>&copy; 2025 RideShare Connect. All Rights Reserved.</p></div>
+        </div>
+    </footer>
+
+    <script>
+        function setRating(rating) {
+            // Reset all stars
+            for (let i = 1; i <= 5; i++) {
+                const star = document.querySelector(`label[for="star${i}"]`);
+                star.classList.remove('bi-star-fill');
+                star.classList.add('bi-star');
+            }
+            // Fill stars up to rating
+            for (let i = 1; i <= rating; i++) {
+                const star = document.querySelector(`label[for="star${i}"]`);
+                star.classList.remove('bi-star');
+                star.classList.add('bi-star-fill');
+            }
+            // Check the radio button
+            document.getElementById(`star${rating}`).checked = true;
+        }
+
+        // Initialize rating if value exists (for edit mode)
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentRating = document.querySelector('input[name="Rating"]:checked')?.value;
+            if (currentRating) {
+                setRating(currentRating);
+            }
+        });
+    </script>
+</body>
