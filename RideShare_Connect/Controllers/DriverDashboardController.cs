@@ -410,6 +410,9 @@ namespace RideShare_Connect.Controllers
                 return NotFound();
             }
 
+            var driver = await _db.Driver.Include(d => d.DriverProfile).FirstOrDefaultAsync(d => d.DriverId == userId);
+            ViewBag.Driver = driver;
+
             var dto = new RideBookingDetailsDto
             {
                 BookingId = booking.Id,
@@ -453,6 +456,54 @@ namespace RideShare_Connect.Controllers
             {
                 return NotFound();
             }
+
+            // Calculate Fare Distribution
+            decimal totalFare = booking.BookedSeats * booking.Ride.PricePerSeat * booking.DistanceKm;
+            decimal driverShare = totalFare * 0.90m;
+            decimal platformShare = totalFare * 0.10m;
+
+            // Update Driver Wallet
+            var driverWallet = await _db.DriverWallets.FirstOrDefaultAsync(w => w.DriverId == userId);
+            if (driverWallet == null)
+            {
+                driverWallet = new DriverWallet
+                {
+                    DriverId = userId,
+                    Balance = 0,
+                    LastUpdated = DateTime.UtcNow
+                };
+                _db.DriverWallets.Add(driverWallet);
+            }
+            driverWallet.Balance += driverShare;
+            driverWallet.LastUpdated = DateTime.UtcNow;
+
+            // Create Transaction Record
+            var transaction = new DriverWalletTransaction
+            {
+                DriverWalletId = driverWallet.Id,
+                Amount = driverShare,
+                TxnType = "Credit",
+                TxnDate = DateTime.UtcNow,
+                Description = $"Ride Earning for Booking #{booking.Id}",
+                TransactionId = Guid.NewGuid().ToString(),
+                PaymentMethod = "Wallet",
+                Status = "Completed"
+            };
+            _db.DriverWalletTransactions.Add(transaction);
+
+            // Update Platform Wallet
+            var platformWallet = await _db.PlatformWallets.FirstOrDefaultAsync();
+            if (platformWallet == null)
+            {
+                platformWallet = new PlatformWallet
+                {
+                    Balance = 0,
+                    LastUpdated = DateTime.UtcNow
+                };
+                _db.PlatformWallets.Add(platformWallet);
+            }
+            platformWallet.Balance += platformShare;
+            platformWallet.LastUpdated = DateTime.UtcNow;
 
             booking.Status = "Completed";
             booking.Ride.Status = "Completed";

@@ -10,6 +10,7 @@
                     <th class="py-3">Status</th>
                     <th class="py-3">Amount</th>
                     <th class="pe-4 py-3">Description</th>
+                    <th class="py-3">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,6 +70,9 @@
                             </td>
                             <td class="pe-4 text-muted">
                                 @txn.Description
+                            </td>
+                            <td>
+                                <a href="@Url.Action("TransactionDetails", "FinancialDashboard", new { id = txn.Id })" class="btn btn-sm btn-outline-primary">View</a>
                             </td>
                         </tr>
                     }

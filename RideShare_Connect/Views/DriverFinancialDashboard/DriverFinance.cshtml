@@ -83,19 +83,11 @@
                             </div>
 
                             <div class="row g-4 mb-4">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <p class="text-muted mb-1">Total Spent This Month</p>
-                                            <h3 class="fw-bold">₹@Model.TotalSpentThisMonth.ToString("F2")</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <p class="text-muted mb-1">Total Saved on Rides</p>
-                                            <h3 class="fw-bold text-success">₹@Model.TotalSavedOnRides.ToString("F2")</h3>
+                                            <p class="text-muted mb-1">Total Earning This Month</p>
+                                            <h3 class="fw-bold text-success">₹@Model.TotalSpentThisMonth.ToString("F2")</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -149,6 +141,7 @@
                             <th>Transction Status</th>
                             <th>Amount</th>
                             <th>Description</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -173,6 +166,9 @@
                                         }
                                     </td>
                                     <td>@txn.Description</td>
+                                    <td>
+                                        <a asp-action="TransactionDetails" asp-route-id="@txn.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
                                 </tr>
                             }
                         }

@@ -490,5 +490,28 @@ namespace RideShare_Connect.Controllers
             TempData["SuccessMessage"] = "Refund request cancelled successfully.";
             return RedirectToAction(nameof(Finance));
         }
+        public async Task<IActionResult> TransactionDetails(int id)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+            var userId = int.Parse(userIdClaim);
+
+            var transaction = await _db.WalletTransactions
+                .Include(t => t.Wallet)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (transaction == null || transaction.Wallet.UserId != userId)
+            {
+                return NotFound();
+            }
+
+            var userProfile = await _db.UserProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
+            ViewBag.UserProfile = userProfile;
+
+            return View(transaction);
+        }
     }
 }

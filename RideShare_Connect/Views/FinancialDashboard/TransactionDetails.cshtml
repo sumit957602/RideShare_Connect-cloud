@@ -1,0 +1,119 @@
+@model RideShare_Connect.Models.PaymentManagement.WalletTransaction
+
+@{
+    ViewData["Title"] = "Transaction Details";
+    var userProfile = ViewBag.UserProfile as RideShare_Connect.Models.UserManagement.UserProfile;
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/finance.css" asp-append-version="true" />
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header & Navbar from Main Site -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="#">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../UserDashboard/User">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="../../FinancialDashboard/Finance">Payments & Finance</a>
+                    </li>
+                </ul>
+                <div class="dropdown ms-lg-3">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="@(userProfile?.ProfilePicture ?? "https://via.placeholder.com/32")" alt="Profile" width="32" height="32" class="rounded-circle me-2">
+                        <strong>@(userProfile?.FullName ?? "User")</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="../../UserDashboard/UserProfile">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item">Sign out</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Transaction Details</h5>
+                        <a asp-action="Finance" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Finance</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="display-4 fw-bold @(Model.TxnType?.ToLower() == "credit" ? "text-success" : "text-danger")">
+                                @(Model.TxnType?.ToLower() == "credit" ? "+" : "-")@Html.Raw("&#8377;")@Model.Amount.ToString("F2")
+                            </div>
+                            <span class="badge @(Model.Status?.ToLower() == "successful" ? "bg-success-subtle text-success-emphasis" : (Model.Status?.ToLower() == "failed" ? "bg-danger-subtle text-danger-emphasis" : "bg-warning-subtle text-warning-emphasis")) rounded-pill fs-6 mt-2">
+                                @Model.Status
+                            </span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted d-block">Transaction ID</small>
+                                    <span class="fw-medium font-monospace">@Model.TransactionId</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted d-block">Date & Time</small>
+                                    <span class="fw-medium">@Model.TxnDate.ToString("MMM dd, yyyy hh:mm tt")</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted d-block">Type</small>
+                                    <span class="fw-medium">@Model.TxnType</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted d-block">Payment Method</small>
+                                    <span class="fw-medium">@Model.PaymentMethod</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted d-block">Description</small>
+                                    <span class="fw-medium">@Model.Description</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer from Main Site -->
+    <footer class="footer mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4"><h5><i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect</h5><p>Your trusted platform for safe, comfortable, and affordable shared rides. Building a community, one ride at a time.</p></div>
+                <div class="col-lg-2 col-md-4 col-6"><h5>Quick Links</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">About Us</a></li><li class="mb-2"><a href="#">Contact</a></li></ul></div>
+                <div class="col-lg-3 col-md-4 col-6"><h5>Legal</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">Privacy Policy</a></li><li class="mb-2"><a href="#">Terms of Service</a></li></ul></div>
+                <div class="col-lg-3 col-md-4"><h5>Contact Us</h5><ul class="list-unstyled"><li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Connect Ave, Patna</li><li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contact@rideshareconnect.com</li></ul></div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);"><div class="text-center"><p>&copy; 2025 RideShare Connect. All Rights Reserved.</p></div>
+        </div>
+    </footer>
+</body>
