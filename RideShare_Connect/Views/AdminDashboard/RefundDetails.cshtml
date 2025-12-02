@@ -1,0 +1,209 @@
+@model RideShare_Connect.Models.PaymentManagement.Refund
+
+@{
+    ViewData["Title"] = "Refund Details";
+    var ride = Model.Payment?.Booking?.Ride;
+    var driver = ride?.Driver;
+    var passenger = Model.Payment?.User;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - RideShare Connect Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="#">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../AdminDashboard/Admin">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Refund Request Details</h4>
+                        <span class="badge @(Model.RefundStatus == "Completed" ? "bg-success-subtle text-success-emphasis" : (Model.RefundStatus == "Processing" ? "bg-warning-subtle text-warning-emphasis" : "bg-danger-subtle text-danger-emphasis")) rounded-pill border border-0 fs-6">
+                            @Model.RefundStatus
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        
+                        <!-- Refund Info -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">Refund Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">Request ID</label>
+                                    <p class="fw-medium">REF@(Model.Id + 1000)</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">Amount</label>
+                                    <p class="fw-bold text-danger">@Model.Amount.ToString("C")</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="fw-bold text-muted small">Reason</label>
+                                    <p class="bg-light p-3 rounded">@Model.Reason</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">Requested Date</label>
+                                    <p>@Model.ProcessedAt.ToString("f")</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Passenger Info -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-primary mb-0">Passenger Details</h5>
+                                <a asp-action="UserDetails" asp-route-id="@passenger?.Id" class="btn btn-sm btn-outline-primary">View Profile</a>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <img src="@(passenger?.UserProfile?.ProfilePicture ?? "https://via.placeholder.com/64")" alt="" width="64" height="64" class="rounded-circle me-3">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">@passenger?.UserProfile?.FullName</h6>
+                                    <p class="mb-0 text-muted">@passenger?.Email</p>
+                                    <p class="mb-0 text-muted small">User ID: @passenger?.Id</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Driver Info -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-primary mb-0">Driver Details</h5>
+                                @if (driver != null)
+                                {
+                                    <a asp-action="DriverDetails" asp-route-id="@driver.DriverId" class="btn btn-sm btn-outline-primary">View Profile</a>
+                                }
+                            </div>
+                            @if (driver != null)
+                            {
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-shape icon-lg bg-secondary-subtle text-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                                        <i class="bi bi-person-fill fs-3"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">@driver.FullName</h6>
+                                        <p class="mb-0 text-muted">@driver.Email</p>
+                                        <p class="mb-0 text-muted small">Phone: @driver.PhoneNumber</p>
+                                        <p class="mb-0 text-muted small">Driver ID: @driver.DriverId</p>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Driver information not available.</p>
+                            }
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Ride Info -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">Ride Details</h5>
+                            @if (ride != null)
+                            {
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-muted small">Ride ID</label>
+                                        <p>#@ride.Id</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-muted small">Status</label>
+                                        <p>@ride.Status</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-muted small">Origin</label>
+                                        <p>@ride.Origin</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-muted small">Destination</label>
+                                        <p>@ride.Destination</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-muted small">Departure Time</label>
+                                        <p>@ride.DepartureTime.ToString("f")</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-muted small">Vehicle</label>
+                                        <p>@ride.Vehicle?.CarMaker @ride.Vehicle?.Model (@ride.Vehicle?.LicensePlate)</p>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Ride information not available.</p>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="card-footer bg-white py-3 text-end">
+                        <a asp-action="Admin" class="btn btn-secondary me-2">Back to Dashboard</a>
+                        @if (Model.RefundStatus == "Processing")
+                        {
+                            <form asp-action="ApproveRefund" asp-route-id="@Model.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to approve this refund?');">Approve Refund</button>
+                            </form>
+                            <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#rejectRefundModal">Reject Refund</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal (Reused) -->
+    <div class="modal fade" id="rejectRefundModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Refund Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="RejectRefund" asp-route-id="@Model.Id" method="post">
+                    <div class="modal-body">
+                        <p>Are you sure you want to reject this refund request?</p>
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for Rejection</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" required placeholder="Please provide a reason..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Reject Refund</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

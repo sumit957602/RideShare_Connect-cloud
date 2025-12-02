@@ -545,5 +545,105 @@ namespace RideShare_Connect.Controllers
             TempData["SuccessMessage"] = "Refund request rejected.";
             return RedirectToAction("Admin");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> RefundDetails(int id)
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var refund = await _db.Refunds
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.Booking)
+                        .ThenInclude(b => b.Ride)
+                            .ThenInclude(ride => ride.Driver)
+                                .ThenInclude(d => d.DriverProfile)
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.Booking)
+                        .ThenInclude(b => b.Ride)
+                            .ThenInclude(ride => ride.Vehicle)
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (refund == null)
+            {
+                return NotFound();
+            }
+
+            return View(refund);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UserDetails(int id)
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var user = await _db.Users
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var completedRides = await _db.RideBookings
+                .Include(rb => rb.Ride)
+                .CountAsync(rb => rb.PassengerId == id && rb.Ride.Status == "Completed");
+
+            var ratings = await _db.UserRatings.Where(r => r.PassengerId == id).Select(r => r.Rating).ToListAsync();
+            var avgRating = ratings.Any() ? ratings.Average() : 0;
+
+            var model = new AdminUserDetailsViewModel
+            {
+                User = user,
+                CompletedRides = completedRides,
+                AverageRating = avgRating
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DriverDetails(int id)
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var driver = await _db.Driver
+                .Include(d => d.DriverProfile)
+                .FirstOrDefaultAsync(d => d.DriverId == id);
+
+            if (driver == null)
+            {
+                return NotFound();
+            }
+
+            var completedRides = await _db.Rides.CountAsync(r => r.DriverId == id && r.Status == "Completed");
+
+            var ratings = await _db.DriverRatings.Where(r => r.DriverId == id).Select(r => r.Rating).ToListAsync();
+            var avgRating = ratings.Any() ? ratings.Average() : 0;
+
+            var model = new AdminDriverDetailsViewModel
+            {
+                Driver = driver,
+                CompletedRides = completedRides,
+                AverageRating = avgRating
+            };
+
+            return View(model);
+        }
     }
 }

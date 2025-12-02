@@ -59,6 +59,7 @@
                             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                                 <button class="nav-link active text-start" id="v-pills-wallet-tab" data-bs-toggle="pill" data-bs-target="#v-pills-wallet" type="button" role="tab" aria-controls="v-pills-wallet" aria-selected="true"><i class="bi bi-pie-chart-fill me-2"></i>Financial Dashboard</button>
                                 <button class="nav-link text-start" id="v-pills-history-tab" data-bs-toggle="pill" data-bs-target="#v-pills-history" type="button" role="tab" aria-controls="v-pills-history" aria-selected="false"><i class="bi bi-clock-history me-2"></i>Transaction History</button>
+                                <button class="nav-link text-start" id="v-pills-reports-tab" data-bs-toggle="pill" data-bs-target="#v-pills-reports" type="button" role="tab" aria-controls="v-pills-reports" aria-selected="false"><i class="bi bi-exclamation-circle-fill me-2"></i>Reports & Complaints</button>
                             </div>
                         </div>
                     </div>
@@ -180,6 +181,59 @@
                         }
                     </tbody>
                 </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reports & Complaints Tab -->
+                        <div class="tab-pane fade" id="v-pills-reports" role="tabpanel" aria-labelledby="v-pills-reports-tab" tabindex="0">
+                            <h4 class="mb-4">Reports & Complaints</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Booking ID</th>
+                                                    <th>Passenger</th>
+                                                    <th>Reason</th>
+                                                    <th>Status</th>
+                                                    <th>Amount</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.Refunds != null && Model.Refunds.Any())
+                                                {
+                                                    foreach (var refund in Model.Refunds)
+                                                    {
+                                                        <tr>
+                                                            <td>#@refund.Payment?.BookingId</td>
+                                                            <td>@refund.Payment?.User?.UserProfile?.FullName</td>
+                                                            <td>@refund.Reason</td>
+                                                            <td>
+                                                                <span class="badge @(refund.RefundStatus == "Completed" ? "bg-success" : (refund.RefundStatus == "Processing" ? "bg-warning" : "bg-secondary"))">
+                                                                    @refund.RefundStatus
+                                                                </span>
+                                                            </td>
+                                                            <td>@refund.Amount.ToString("C")</td>
+                                                            <td>@refund.ProcessedAt.ToString("yyyy-MM-dd")</td>
+                                                            <td>
+                                                                <a asp-action="RefundDetails" asp-route-id="@refund.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="7" class="text-center text-muted">No reports or complaints found.</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>

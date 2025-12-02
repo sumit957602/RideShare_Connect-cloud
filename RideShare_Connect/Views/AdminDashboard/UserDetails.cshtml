@@ -1,0 +1,106 @@
+@model RideShare_Connect.ViewModels.AdminUserDetailsViewModel
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - RideShare Connect Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="#">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../AdminDashboard/Admin">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h4 class="mb-0">User Details</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="@(Model.User.UserProfile?.ProfilePicture ?? "https://via.placeholder.com/128")" alt="" width="128" height="128" class="rounded-circle mb-3 shadow-sm">
+                        <h3 class="fw-bold">@Model.User.UserProfile?.FullName</h3>
+                        <p class="text-muted">@Model.User.Email</p>
+                        <span class="badge @(Model.User.AccountStatus == "Active" ? "bg-success-subtle text-success-emphasis" : "bg-danger-subtle text-danger-emphasis") rounded-pill border border-0 mb-4">
+                            @Model.User.AccountStatus
+                        </span>
+
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card bg-light border-0 h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary"><i class="bi bi-star-fill me-2"></i>Rating</h5>
+                                        <h2 class="fw-bold">@Model.AverageRating.ToString("0.0")</h2>
+                                        <p class="text-muted small mb-0">Average Rating</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light border-0 h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success"><i class="bi bi-car-front-fill me-2"></i>Rides</h5>
+                                        <h2 class="fw-bold">@Model.CompletedRides</h2>
+                                        <p class="text-muted small mb-0">Completed Rides</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-5">
+
+                        <div class="text-start">
+                            <h5 class="mb-3">Contact Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted small">Phone Number</label>
+                                    <p>@Model.User.PhoneNumber</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted small">Joined Date</label>
+                                    <p>@Model.User.CreatedAt.ToString("MMM dd, yyyy")</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted small">User Type</label>
+                                    <p>@Model.User.UserType</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer bg-white py-3 text-end">
+                        <a href="javascript:history.back()" class="btn btn-secondary">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

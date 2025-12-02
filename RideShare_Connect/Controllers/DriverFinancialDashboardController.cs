@@ -82,6 +82,18 @@ namespace RideShare_Connect.Controllers
                 };
             }
 
+            // Fetch Refunds associated with this driver's rides
+            var refunds = await _db.Refunds
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.Booking)
+                        .ThenInclude(b => b.Ride)
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.User) // Passenger
+                        .ThenInclude(u => u.UserProfile)
+                .Where(r => r.Payment.Booking.Ride.DriverId == driverId)
+                .OrderByDescending(r => r.ProcessedAt)
+                .ToListAsync();
+
             var model = new FinanceViewModel
             {
                 WalletBalance = balance,
@@ -89,7 +101,8 @@ namespace RideShare_Connect.Controllers
                 TotalSavedOnRides = 0,
                 TransactionHistory = walletTransactions,
                 RecentTransactions = walletTransactions.Take(3).ToList(),
-                Profile = profile
+                Profile = profile,
+                Refunds = refunds
             };
 
             ViewBag.RazorpayKey = _config["PaymentGateway:ApiKey"];
@@ -138,6 +151,34 @@ namespace RideShare_Connect.Controllers
             }
 
             return View(transaction);
+        }
+
+        public async Task<IActionResult> RefundDetails(int id)
+        {
+            var driverIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(driverIdClaim) || !int.TryParse(driverIdClaim, out var driverId))
+            {
+                return RedirectToAction("Login", "DriverAccount");
+            }
+
+            var refund = await _db.Refunds
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.Booking)
+                        .ThenInclude(b => b.Ride)
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.User) // Passenger
+                        .ThenInclude(u => u.UserProfile)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (refund == null || refund.Payment.Booking.Ride.DriverId != driverId)
+            {
+                return NotFound();
+            }
+
+            var driver = await _db.Driver.Include(d => d.DriverProfile).FirstOrDefaultAsync(d => d.DriverId == driverId);
+            ViewBag.Driver = driver;
+
+            return View(refund);
         }
     }
 }

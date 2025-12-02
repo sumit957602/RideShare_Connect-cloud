@@ -493,8 +493,9 @@
                                                         @if (refund.RefundStatus == "Processing")
                                                         {
                                                             <div class="btn-group btn-group-sm">
+                                                                <a asp-action="RefundDetails" asp-route-id="@refund.Id" class="btn btn-outline-primary" title="View Details"><i class="bi bi-eye-fill"></i></a>
                                                                 <form asp-action="ApproveRefund" asp-route-id="@refund.Id" method="post" class="d-inline">
-                                                                    <button type="submit" class="btn btn-outline-success" title="Approve Refund" onclick="return confirm('Are you sure you want to approve this refund? Amount will be credited to user wallet.');"><i class="bi bi-check-lg"></i></button>
+                                                                    <button type="submit" class="btn btn-outline-success ms-1" title="Approve Refund" onclick="return confirm('Are you sure you want to approve this refund? Amount will be credited to user wallet.');"><i class="bi bi-check-lg"></i></button>
                                                                 </form>
                                                                 <button type="button" class="btn btn-outline-danger ms-1" title="Reject Refund" data-bs-toggle="modal" data-bs-target="#rejectRefundModal-@refund.Id"><i class="bi bi-x-lg"></i></button>
                                                             </div>
