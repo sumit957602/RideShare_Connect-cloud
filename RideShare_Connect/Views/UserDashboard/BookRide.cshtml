@@ -8,57 +8,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Ride - RideShare Connect</title>
+    
+    <!-- CSS Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/driverCreateRide.css" asp-append-version="true" />
+    
     <style>
-        #map { height: 400px; }
+        #map { height: 400px; width: 100%; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div class="container py-4">
-        <h2 class="mb-4">Book Ride</h2>
-        <form id="bookRideForm" class="row g-3">
-            @Html.AntiForgeryToken()
-            <div class="col-md-6">
-                <label for="pickup" class="form-label">Pickup Location</label>
-                <input type="text" id="pickup" class="form-control" placeholder="Enter pickup location" />
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="#">
+                <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="UserDashboard" asp-action="User">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Book a Ride</a>
+                    </li>
+                </ul>
+                <div class="dropdown ms-lg-3">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="" alt="Profile" width="32" height="32" class="rounded-circle me-2">
+                        <strong>User</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                             <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item">Sign out</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="col-md-6">
-                <label for="drop" class="form-label">Drop Location</label>
-                <input type="text" id="drop" class="form-control" placeholder="Enter drop location" />
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <div class="card">
+                <div class="form-card-header text-center">
+                    <h2 class="mb-0">Book Your Ride</h2>
+                    <p class="mb-0">Enter your details and confirm your booking.</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                     <form id="bookRideForm">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-5">
+                            <!-- Form Fields -->
+                            <div class="col-lg-6">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label for="pickup" class="form-label">Pickup Location</label>
+                                        <input type="text" id="pickup" class="form-control" placeholder="Enter pickup location" />
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="drop" class="form-label">Drop Location</label>
+                                        <input type="text" id="drop" class="form-control" placeholder="Enter drop location" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="distance" class="form-label">Distance (km)</label>
+                                        <input type="text" id="distance" class="form-control" readonly />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="numPersons" class="form-label">No of Person</label>
+                                        <input type="number" id="numPersons" class="form-control" value="1" min="1" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="paymentMode" class="form-label">Payment Mode</label>
+                                        <select id="paymentMode" class="form-select">
+                                            <option value="Wallet">Wallet</option>
+                                            <option value="Razor Pay">Razor Pay</option>
+                                            <option value="Cash">Cash</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="totalFare" class="form-label">Total Fare</label>
+                                        <input type="text" id="totalFare" class="form-control" readonly />
+                                    </div>
+                                    <div class="col-12 text-end mt-4">
+                                        <a asp-action="User" class="btn btn-secondary me-2">Back</a>
+                                        <button type="submit" class="btn btn-primary">Book Ride</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Map -->
+                            <div class="col-lg-6">
+                                <div id="map"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label for="distance" class="form-label">Distance (km)</label>
-                <input type="text" id="distance" class="form-control" readonly />
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4"><h5><i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect</h5><p>Your trusted platform for safe, comfortable, and affordable shared rides.</p></div>
+                <div class="col-lg-2 col-md-4 col-6"><h5>Quick Links</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">About Us</a></li><li class="mb-2"><a href="#">Contact</a></li></ul></div>
+                <div class="col-lg-3 col-md-4 col-6"><h5>Legal</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">Privacy Policy</a></li><li class="mb-2"><a href="#">Terms of Service</a></li></ul></div>
+                <div class="col-lg-3 col-md-4"><h5>Contact Us</h5><ul class="list-unstyled"><li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Connect Ave, Patna</li><li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contact@rideshareconnect.com</li></ul></div>
             </div>
-            <div class="col-md-3">
-                <label for="numPersons" class="form-label">No of Person</label>
-                <input type="number" id="numPersons" class="form-control" value="1" min="1" />
-            </div>
-            <div class="col-md-3">
-                <label for="paymentMode" class="form-label">Payment Mode</label>
-                <select id="paymentMode" class="form-select">
-                    <option value="Wallet">Wallet</option>
-                    <option value="Razor Pay">Razor Pay</option>
-                    <option value="Cash">Cash</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="totalFare" class="form-label">Total Fare</label>
-                <input type="text" id="totalFare" class="form-control" readonly />
-            </div>
-            <div class="col-12">
-                <div id="map"></div>
-            </div>
-            <div class="col-12 text-end">
-                <a asp-action="User" class="btn btn-secondary me-2">Back</a>
-                <button type="submit" class="btn btn-primary">Book Ride</button>
-            </div>
-        </form>
-    </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);"><div class="text-center"><p>&copy; 2025 RideShare Connect. All Rights Reserved.</p></div>
+        </div>
+    </footer>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const map = L.map('map').setView([25.5941, 85.1376], 13);
@@ -76,7 +158,7 @@
             const numPersonsInput = document.getElementById('numPersons');
             const totalFareInput = document.getElementById('totalFare');
             const paymentModeSelect = document.getElementById('paymentMode');
-            const form = document.querySelector('form');
+            const form = document.getElementById('bookRideForm');
             const userId = '@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)';
             const razorpayKey = '@ViewBag.RazorpayKey';
             const pricePerSeat = parseFloat('@Model.PricePerSeat.ToString(System.Globalization.CultureInfo.InvariantCulture)');
