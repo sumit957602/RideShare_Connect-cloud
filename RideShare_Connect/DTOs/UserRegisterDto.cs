@@ -11,7 +11,7 @@ namespace RideShare_Connect.DTOs
 
         [Required(ErrorMessage = "Phone number is required")]
         [Phone(ErrorMessage = "Invalid phone number")]
-        [RegularExpression(@"^\+?[0-9]{10,15}$", ErrorMessage = "Phone number must be between 10 and 15 digits.")]
+        [RegularExpression(@"^[6-9]\d{9}$", ErrorMessage = "Phone number must be 10 digits and start with 6, 7, 8, or 9.")]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
@@ -28,7 +28,14 @@ namespace RideShare_Connect.DTOs
         [RegularExpression(@"^[a-zA-Z\s]*$", ErrorMessage = "Full Name can only contain letters and spaces.")]
         public string FullName { get; set; }
 
+        [Required(ErrorMessage = "Secret Key is required")]
+        [StringLength(50, MinimumLength = 6, ErrorMessage = "Secret Key must be between 6 and 50 characters.")]
+        public string SecretKey { get; set; }
+
         public string UserType { get; set; } = "Rider";
+
+        [RideShare_Connect.Attributes.MustBeTrue(ErrorMessage = "You must agree to the Terms and Conditions.")]
+        public bool TermsAccepted { get; set; }
 
         public string? Otp { get; set; }
     }

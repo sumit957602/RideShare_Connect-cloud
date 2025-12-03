@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RideShare_Connect.Migrations
 {
     /// <inheritdoc />
-    public partial class skk : Migration
+    public partial class AddStrictConstraintsWithCleanup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -152,6 +152,7 @@ namespace RideShare_Connect.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.CheckConstraint("CK_User_PhoneNumber_Valid", "`PhoneNumber` REGEXP '^[6-9][0-9]{9}$'");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -1219,27 +1220,6 @@ namespace RideShare_Connect.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Rides_DriverId",
                 table: "Rides",
-                column: "DriverId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rides_VehicleId",
-                table: "Rides",
-                column: "VehicleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RoutePoints_RideId",
-                table: "RoutePoints",
-                column: "RideId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserProfiles_UserId",
-                table: "UserProfiles",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserRatings_DriverId",
-                table: "UserRatings",
                 column: "DriverId");
 
             migrationBuilder.CreateIndex(

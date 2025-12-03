@@ -126,6 +126,10 @@ namespace RideShareConnect.Data
             // Add Check Constraint for FullName (No Numbers)
             modelBuilder.Entity<UserProfile>()
                 .ToTable(t => t.HasCheckConstraint("CK_UserProfile_FullName_NoNumbers", "`FullName` NOT REGEXP '[0-9]'"));
+
+            // Add Check Constraint for PhoneNumber (10 digits, starts with 6-9)
+            modelBuilder.Entity<User>()
+                .ToTable(t => t.HasCheckConstraint("CK_User_PhoneNumber_Valid", "`PhoneNumber` REGEXP '^[6-9][0-9]{9}$'"));
         }
     }
 }

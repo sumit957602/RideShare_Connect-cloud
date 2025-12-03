@@ -14,6 +14,9 @@ namespace RideShare_Connect.Models.UserManagement
         public string PhoneNumber { get; set; }
 
         [Required]
+        public string SecretKey { get; set; }
+
+        [Required]
         public string PasswordHash { get; set; }
 
         public string UserType { get; set; } 

@@ -12,8 +12,8 @@ using RideShareConnect.Data;
 namespace RideShare_Connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251203132715_skk")]
-    partial class skk
+    [Migration("20251203140228_AddStrictConstraintsWithCleanup")]
+    partial class AddStrictConstraintsWithCleanup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -976,7 +976,10 @@ namespace RideShare_Connect.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", t =>
+                        {
+                            t.HasCheckConstraint("CK_User_PhoneNumber_Valid", "`PhoneNumber` REGEXP '^[6-9][0-9]{9}$'");
+                        });
                 });
 
             modelBuilder.Entity("RideShare_Connect.Models.UserManagement.UserProfile", b =>

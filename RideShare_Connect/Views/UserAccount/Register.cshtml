@@ -69,6 +69,16 @@
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
 
+                                    <!-- Secret Key -->
+                                    <div class="mb-3">
+                                        <label for="secretKey" class="form-label">Secret Key</label>
+                                        <input type="text" asp-for="SecretKey" class="form-control" id="secretKey" placeholder="Enter a secret key" required />
+                                        <div class="form-text text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>This key will be used to reset your password if you forget it. Keep it safe!
+                                        </div>
+                                        <span asp-validation-for="SecretKey" class="text-danger"></span>
+                                    </div>
+
                                     <div class="mb-3">
                                         <label asp-for="ConfirmPassword" class="form-label"></label>
                                         <input asp-for="ConfirmPassword" class="form-control" type="password" id="confirmPassword" placeholder="••••••••" />
@@ -82,10 +92,11 @@
                                     <input type="hidden" asp-for="UserType" value="Rider" />
                                     <!-- Terms and Conditions -->
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" value="" id="termsCheck" required />
+                                        <input class="form-check-input" type="checkbox" asp-for="TermsAccepted" id="termsCheck" />
                                         <label class="form-check-label" for="termsCheck">
-                                            I agree to the <a href="#">Terms and Conditions</a>
+                                            I agree to the <a asp-controller="Home" asp-action="Terms" target="_blank">Terms and Conditions</a>
                                         </label>
+                                        <span asp-validation-for="TermsAccepted" class="text-danger d-block"></span>
                                     </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>

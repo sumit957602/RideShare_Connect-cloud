@@ -55,7 +55,8 @@ namespace RideShare_Connect.Controllers
                 PhoneNumber = model.PhoneNumber,
                 UserType = model.UserType ?? "Rider",
                 AccountStatus = "Active",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                SecretKey = model.SecretKey
             };
 
             newUser.PasswordHash = _passwordHasher.HashPassword(newUser, model.Password);
@@ -251,10 +252,53 @@ namespace RideShare_Connect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
-             if (!ModelState.IsValid) return View(dto);
-             // Implement logic
-             TempData["SuccessMessage"] = "If the email exists, a reset link has been sent (Mock).";
-             return RedirectToAction("Login");
+            if (!ModelState.IsValid) return View(dto);
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("Email", "User not found.");
+                return View(dto);
+            }
+
+            return RedirectToAction("ResetPassword", new { email = dto.Email });
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("ForgotPassword");
+            }
+            return View(new UserResetPasswordDto { Email = email });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(UserResetPasswordDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("Email", "User not found.");
+                return View(dto);
+            }
+
+            if (user.SecretKey != dto.SecretKey)
+            {
+                ModelState.AddModelError("SecretKey", "Invalid Secret Key.");
+                return View(dto);
+            }
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, dto.NewPassword);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Password reset successfully! You can now log in.";
+            return RedirectToAction("Login");
         }
     }
 }
