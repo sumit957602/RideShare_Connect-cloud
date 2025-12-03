@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RideShare_Connect.Migrations
 {
     /// <inheritdoc />
-    public partial class AddStrictConstraintsWithCleanup : Migration
+    public partial class skk : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -140,6 +140,8 @@ namespace RideShare_Connect.Migrations
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PhoneNumber = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SecretKey = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PasswordHash = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -1220,6 +1222,27 @@ namespace RideShare_Connect.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Rides_DriverId",
                 table: "Rides",
+                column: "DriverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rides_VehicleId",
+                table: "Rides",
+                column: "VehicleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoutePoints_RideId",
+                table: "RoutePoints",
+                column: "RideId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfiles_UserId",
+                table: "UserProfiles",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRatings_DriverId",
+                table: "UserRatings",
                 column: "DriverId");
 
             migrationBuilder.CreateIndex(

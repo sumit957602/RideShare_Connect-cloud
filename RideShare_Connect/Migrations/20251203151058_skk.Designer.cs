@@ -12,8 +12,8 @@ using RideShareConnect.Data;
 namespace RideShare_Connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251203140228_AddStrictConstraintsWithCleanup")]
-    partial class AddStrictConstraintsWithCleanup
+    [Migration("20251203151058_skk")]
+    partial class skk
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -967,6 +967,10 @@ namespace RideShare_Connect.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SecretKey")
                         .IsRequired()
                         .HasColumnType("longtext");
 

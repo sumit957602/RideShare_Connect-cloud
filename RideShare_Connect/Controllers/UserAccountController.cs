@@ -179,8 +179,13 @@ namespace RideShare_Connect.Controllers
                     UserType = "Rider",
                     AccountStatus = "Active",
                     CreatedAt = DateTime.UtcNow,
-                    PhoneNumber = "0000000000" // Placeholder
+                    PhoneNumber = "9000000000", // Placeholder valid phone number
+                    SecretKey = Guid.NewGuid().ToString().Substring(0, 8) // Generate a random secret key
                 };
+                
+                // Set a dummy password hash as it's required, but user logs in via Google
+                user.PasswordHash = _passwordHasher.HashPassword(user, Guid.NewGuid().ToString());
+
                  user.UserProfile = new UserProfile
                 {
                     FullName = name ?? "Google User",
@@ -190,6 +195,28 @@ namespace RideShare_Connect.Controllers
                 };
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Ensure existing users have required fields (SecretKey, PhoneNumber)
+                bool changed = false;
+                if (string.IsNullOrEmpty(user.SecretKey))
+                {
+                    user.SecretKey = Guid.NewGuid().ToString().Substring(0, 8);
+                    changed = true;
+                }
+                // Check if phone number is valid (10 digits, starts with 6-9)
+                if (string.IsNullOrEmpty(user.PhoneNumber) || !System.Text.RegularExpressions.Regex.IsMatch(user.PhoneNumber, @"^[6-9]\d{9}$"))
+                {
+                    user.PhoneNumber = "9000000000"; // Placeholder
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                }
             }
 
             var claims = new List<Claim>
