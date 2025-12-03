@@ -505,6 +505,17 @@ namespace RideShare_Connect.Controllers
             platformWallet.Balance += platformShare;
             platformWallet.LastUpdated = DateTime.UtcNow;
 
+            // Create Commission Record
+            var commission = new Commission
+            {
+                BookingId = booking.Id,
+                PlatformFee = platformShare,
+                Percentage = 10, // 10%
+                PaidOut = true, // Collected into wallet
+                PayoutDate = DateTime.UtcNow
+            };
+            _db.Commissions.Add(commission);
+
             booking.Status = "Completed";
             booking.Ride.Status = "Completed";
 

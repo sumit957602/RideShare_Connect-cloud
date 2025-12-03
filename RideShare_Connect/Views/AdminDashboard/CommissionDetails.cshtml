@@ -1,0 +1,212 @@
+@model RideShare_Connect.Models.PaymentManagement.Commission
+
+@{
+    ViewData["Title"] = "Commission Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color: #212529;">
+    <div class="container">
+        <a class="navbar-brand fs-4" asp-action="Admin" asp-controller="AdminDashboard">
+            <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" asp-action="Admin" asp-controller="AdminDashboard">Admin Panel</a>
+                </li>
+            </ul>
+            <div class="dropdown ms-lg-3">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="@ViewBag.AdminProfilePicUrl" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>@ViewBag.AdminName</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                    <li><a class="dropdown-item" asp-controller="AdminAccount" asp-action="Settings">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="dropdown-item">Sign out</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">Commission Details</h1>
+            <p class="text-muted">Transaction ID: <span class="font-monospace">COM-@Model.Id</span></p>
+        </div>
+        <a asp-action="PlatformTransactions" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Back to List</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Transaction Summary -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-wallet2 me-2"></i>Transaction Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4 text-center">
+                        <p class="text-muted mb-1">Platform Fee</p>
+                        <h2 class="display-6 fw-bold text-success">+₹@Model.PlatformFee.ToString("N2")</h2>
+                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill border border-0 px-3 py-2">
+                            Credited
+                        </span>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Percentage</span>
+                            <span class="fw-medium">@Model.Percentage.ToString("0.##")%</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Date</span>
+                            <span class="fw-medium">@(Model.PayoutDate?.ToString("MMM dd, yyyy HH:mm") ?? Model.Booking?.BookingTime.ToString("MMM dd, yyyy HH:mm") ?? "N/A")</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Status</span>
+                            <span class="fw-medium text-success">Paid Out</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ride & Booking Details -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Source Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Ride Info -->
+                        <div class="col-md-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3">Ride Information</h6>
+                            <div class="mb-3">
+                                <label class="small text-muted d-block">Route</label>
+                                <div class="fw-medium">@Model.Booking?.Ride?.Origin <i class="bi bi-arrow-right mx-1 text-muted"></i> @Model.Booking?.Ride?.Destination</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted d-block">Departure</label>
+                                <div>@Model.Booking?.Ride?.DepartureTime.ToString("MMM dd, yyyy HH:mm")</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted d-block">Vehicle</label>
+                                <div>@(Model.Booking?.Ride?.Vehicle?.CarMaker ?? "Unknown") @(Model.Booking?.Ride?.Vehicle?.Model ?? "") (@(Model.Booking?.Ride?.Vehicle?.LicensePlate ?? "N/A"))</div>
+                            </div>
+                        </div>
+
+                        <!-- Driver Info -->
+                        <div class="col-md-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3">Driver Information</h6>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="avatar-initial rounded-circle bg-light text-primary me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">@(Model.Booking?.Ride?.Driver?.FullName ?? "Unknown")</div>
+                                    <div class="small text-muted">@(Model.Booking?.Ride?.Driver?.Email ?? "No Email")</div>
+                                    <div class="small text-muted">@(Model.Booking?.Ride?.Driver?.PhoneNumber ?? "No Phone")</div>
+                                </div>
+                            </div>
+                            <div>
+                                <a asp-action="DriverDetails" asp-route-id="@Model.Booking?.Ride?.DriverId" class="btn btn-sm btn-outline-primary">View Driver Profile</a>
+                            </div>
+                        </div>
+
+                        <div class="col-12"><hr></div>
+
+                        <!-- Booking Info -->
+                        <div class="col-md-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3">Booking Information</h6>
+                            <div class="mb-3">
+                                <label class="small text-muted d-block">Booking ID</label>
+                                <div class="font-monospace">#@Model.BookingId</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted d-block">Booked Seats</label>
+                                <div>@Model.Booking?.BookedSeats Seats</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted d-block">Total Fare</label>
+                                <div class="fw-bold">₹@((Model.Booking?.BookedSeats * Model.Booking?.Ride?.PricePerSeat * Model.Booking?.DistanceKm)?.ToString("N2") ?? "0.00")</div>
+                            </div>
+                        </div>
+
+                        <!-- Passenger Info -->
+                        <div class="col-md-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3">Passenger Information</h6>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="avatar-initial rounded-circle bg-light text-info me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">@(Model.Booking?.User?.UserProfile?.FullName ?? "Unknown")</div>
+                                    <div class="small text-muted">@(Model.Booking?.User?.Email ?? "No Email")</div>
+                                </div>
+                            </div>
+                            <div>
+                                <a asp-action="UserDetails" asp-route-id="@Model.Booking?.PassengerId" class="btn btn-sm btn-outline-info">View User Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-auto py-3 bg-dark text-white">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h5><i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect</h5>
+                <p>Your trusted platform for safe, comfortable, and affordable shared rides. Building a community, one ride at a time.</p>
+                <div class="social-icons mt-3">
+                    <a href="#" class="text-white me-2"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4 col-6">
+                <h5>Legal</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <h5>Contact Us</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Connect Ave, Patna</li>
+                    <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contact@rideshareconnect.com</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+        <div class="text-center">
+            <p>&copy; 2025 RideShare Connect. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>

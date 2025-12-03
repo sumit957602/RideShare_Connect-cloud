@@ -692,5 +692,40 @@ namespace RideShare_Connect.Controllers
 
             return View(commissions);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CommissionDetails(int id)
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var adminId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var admin = await _db.Admins.FirstOrDefaultAsync(a => a.Id == adminId);
+            ViewBag.AdminName = !string.IsNullOrEmpty(admin?.FullName) ? admin.FullName : admin?.Username;
+            ViewBag.AdminProfilePicUrl = !string.IsNullOrEmpty(admin?.ProfilePicUrl) ? admin.ProfilePicUrl : "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+
+            var commission = await _db.Commissions
+                .Include(c => c.Booking)
+                .ThenInclude(b => b.Ride)
+                .ThenInclude(r => r.Driver)
+                .ThenInclude(d => d.DriverProfile)
+                .Include(c => c.Booking)
+                .ThenInclude(b => b.Ride)
+                .ThenInclude(r => r.Vehicle)
+                .Include(c => c.Booking)
+                .ThenInclude(b => b.User)
+                .ThenInclude(u => u.UserProfile)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (commission == null)
+            {
+                return NotFound();
+            }
+
+            return View(commission);
+        }
     }
 }
