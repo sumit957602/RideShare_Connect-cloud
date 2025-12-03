@@ -645,5 +645,52 @@ namespace RideShare_Connect.Controllers
 
             return View(model);
         }
+        [HttpGet]
+        public async Task<IActionResult> RevenueTransactions()
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var adminId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var admin = await _db.Admins.FirstOrDefaultAsync(a => a.Id == adminId);
+            ViewBag.AdminName = !string.IsNullOrEmpty(admin?.FullName) ? admin.FullName : admin?.Username;
+            ViewBag.AdminProfilePicUrl = !string.IsNullOrEmpty(admin?.ProfilePicUrl) ? admin.ProfilePicUrl : "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+
+            var payments = await _db.Payments
+                .Include(p => p.User)
+                .ThenInclude(u => u.UserProfile)
+                .Where(p => p.Status == "Completed")
+                .OrderByDescending(p => p.PaymentDate)
+                .ToListAsync();
+
+            return View(payments);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PlatformTransactions()
+        {
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (!User.Identity.IsAuthenticated || role != "Admin")
+            {
+                return RedirectToAction("AdminLogin", "AdminAccount");
+            }
+
+            var adminId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var admin = await _db.Admins.FirstOrDefaultAsync(a => a.Id == adminId);
+            ViewBag.AdminName = !string.IsNullOrEmpty(admin?.FullName) ? admin.FullName : admin?.Username;
+            ViewBag.AdminProfilePicUrl = !string.IsNullOrEmpty(admin?.ProfilePicUrl) ? admin.ProfilePicUrl : "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+
+            var commissions = await _db.Commissions
+                .Include(c => c.Booking)
+                .ThenInclude(b => b.Ride)
+                .ThenInclude(r => r.Driver)
+                .OrderByDescending(c => c.Booking.BookingTime) // Assuming Booking has a date, or use PayoutDate if available/relevant
+                .ToListAsync();
+
+            return View(commissions);
+        }
     }
 }

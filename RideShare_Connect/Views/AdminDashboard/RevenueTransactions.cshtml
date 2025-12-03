@@ -1,0 +1,150 @@
+@model IEnumerable<RideShare_Connect.Models.PaymentManagement.Payment>
+
+@{
+    ViewData["Title"] = "Revenue Transactions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color: #212529;">
+    <div class="container">
+        <a class="navbar-brand fs-4" asp-action="Admin" asp-controller="AdminDashboard">
+            <i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" asp-action="Admin" asp-controller="AdminDashboard">Admin Panel</a>
+                </li>
+            </ul>
+            <div class="dropdown ms-lg-3">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="@ViewBag.AdminProfilePicUrl" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>@ViewBag.AdminName</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                    <li><a class="dropdown-item" asp-controller="AdminAccount" asp-action="Settings">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="dropdown-item">Sign out</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 py-4" style="min-height: 80vh;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Revenue Transactions</h1>
+        <a asp-action="Admin" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3">Transaction ID</th>
+                            <th class="py-3">User</th>
+                            <th class="py-3">Amount</th>
+                            <th class="py-3">Date</th>
+                            <th class="py-3">Status</th>
+                            <th class="pe-4 py-3">Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var payment in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 font-monospace">@(payment.ProviderTransactionId ?? payment.Id.ToString())</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-initial rounded-circle bg-light text-primary me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="bi bi-person-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">@(payment.User?.UserProfile?.FullName ?? payment.User?.Email ?? "Unknown")</div>
+                                                <div class="small text-muted">@payment.User?.Email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">₹@payment.Amount.ToString("N2")</td>
+                                    <td>@payment.PaymentDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="badge @(payment.Status == "Completed" ? "bg-success-subtle text-success-emphasis" : "bg-warning-subtle text-warning-emphasis") rounded-pill border border-0">
+                                            @payment.Status
+                                        </span>
+                                    </td>
+                                    <td class="pe-4">@payment.PaymentMode</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-receipt fs-1 d-block mb-2"></i>
+                                    No transactions found.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-auto py-3 bg-dark text-white">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h5><i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect</h5>
+                <p>Your trusted platform for safe, comfortable, and affordable shared rides. Building a community, one ride at a time.</p>
+                <div class="social-icons mt-3">
+                    <a href="#" class="text-white me-2"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4 col-6">
+                <h5>Legal</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <h5>Contact Us</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Connect Ave, Patna</li>
+                    <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contact@rideshareconnect.com</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+        <div class="text-center">
+            <p>&copy; 2025 RideShare Connect. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
