@@ -464,7 +464,12 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("AdminLogin", "AdminAccount");
             }
 
-            var refund = await _db.Refunds.Include(r => r.Payment).FirstOrDefaultAsync(r => r.Id == id);
+            var refund = await _db.Refunds
+                .Include(r => r.Payment)
+                .ThenInclude(p => p.Booking)
+                .ThenInclude(b => b.Ride)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (refund == null)
             {
                 return NotFound();
@@ -476,15 +481,88 @@ namespace RideShare_Connect.Controllers
                 return RedirectToAction("Admin");
             }
 
-            // 1. Update Refund Status
+            // Calculate Refund Splits
+            decimal refundAmount = refund.Amount;
+            decimal driverDeduction = refundAmount * 0.90m;
+            decimal platformDeduction = refundAmount * 0.10m;
+
+            // 1. Deduct from Driver Wallet
+            var driverId = refund.Payment.Booking.Ride.DriverId;
+            var driverWallet = await _db.DriverWallets.FirstOrDefaultAsync(w => w.DriverId == driverId);
+            
+            if (driverWallet != null)
+            {
+                if (driverWallet.Balance >= driverDeduction)
+                {
+                    driverWallet.Balance -= driverDeduction;
+                    driverWallet.LastUpdated = DateTime.UtcNow;
+                    _db.DriverWallets.Update(driverWallet);
+
+                    _db.DriverWalletTransactions.Add(new DriverWalletTransaction
+                    {
+                        DriverWalletId = driverWallet.Id,
+                        Amount = -driverDeduction,
+                        TxnType = "Debit",
+                        TxnDate = DateTime.UtcNow,
+                        Description = $"Refund Deduction for Booking #{refund.Payment.BookingId}",
+                        TransactionId = Guid.NewGuid().ToString(),
+                        PaymentMethod = "Wallet",
+                        Status = "Completed"
+                    });
+                }
+                else
+                {
+                    // Handle insufficient funds? For now, we allow negative balance or just deduct what's there?
+                    // Usually platforms allow negative balance for adjustments.
+                    driverWallet.Balance -= driverDeduction;
+                    driverWallet.LastUpdated = DateTime.UtcNow;
+                    _db.DriverWallets.Update(driverWallet);
+
+                    _db.DriverWalletTransactions.Add(new DriverWalletTransaction
+                    {
+                        DriverWalletId = driverWallet.Id,
+                        Amount = -driverDeduction,
+                        TxnType = "Debit",
+                        TxnDate = DateTime.UtcNow,
+                        Description = $"Refund Deduction for Booking #{refund.Payment.BookingId}",
+                        TransactionId = Guid.NewGuid().ToString(),
+                        PaymentMethod = "Wallet",
+                        Status = "Completed"
+                    });
+                }
+            }
+
+            // 2. Deduct from Platform Wallet
+            var platformWallet = await _db.PlatformWallets.FirstOrDefaultAsync();
+            if (platformWallet != null)
+            {
+                platformWallet.Balance -= platformDeduction;
+                platformWallet.LastUpdated = DateTime.UtcNow;
+                _db.PlatformWallets.Update(platformWallet);
+
+                // Log Platform Deduction in Commissions table
+                var commissionDeduction = new Commission
+                {
+                    BookingId = refund.Payment.BookingId,
+                    PlatformFee = -platformDeduction, // Negative amount for deduction
+                    Percentage = 10,
+                    PaidOut = true,
+                    PayoutDate = DateTime.UtcNow
+                };
+                _db.Commissions.Add(commissionDeduction);
+            }
+
+            // 3. Update Refund Status
             refund.RefundStatus = "Completed";
+            refund.ProcessedAt = DateTime.UtcNow; // Ensure ProcessedAt is set
             _db.Refunds.Update(refund);
 
-            // 2. Refund to User Wallet
+            // 4. Refund to User Wallet
             var userWallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == refund.Payment.UserId);
             if (userWallet != null)
             {
                 userWallet.Balance += refund.Amount;
+                userWallet.LastUpdated = DateTime.UtcNow;
                 _db.Wallets.Update(userWallet);
 
                 _db.WalletTransactions.Add(new WalletTransaction
@@ -501,7 +579,7 @@ namespace RideShare_Connect.Controllers
             }
 
             await _db.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Refund approved and amount credited to user wallet.";
+            TempData["SuccessMessage"] = "Refund approved. Amount deducted from Driver and Platform, and credited to User.";
             return RedirectToAction("Admin");
         }
 

@@ -12,8 +12,8 @@ using RideShareConnect.Data;
 namespace RideShare_Connect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251202105849_AddUserRatings")]
-    partial class AddUserRatings
+    [Migration("20251203132715_skk")]
+    partial class skk
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1013,7 +1013,10 @@ namespace RideShare_Connect.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserProfiles");
+                    b.ToTable("UserProfiles", t =>
+                        {
+                            t.HasCheckConstraint("CK_UserProfile_FullName_NoNumbers", "`FullName` NOT REGEXP '[0-9]'");
+                        });
                 });
 
             modelBuilder.Entity("RideShare_Connect.Models.UserManagement.UserRating", b =>

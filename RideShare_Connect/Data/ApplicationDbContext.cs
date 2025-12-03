@@ -122,6 +122,10 @@ namespace RideShareConnect.Data
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Add Check Constraint for FullName (No Numbers)
+            modelBuilder.Entity<UserProfile>()
+                .ToTable(t => t.HasCheckConstraint("CK_UserProfile_FullName_NoNumbers", "`FullName` NOT REGEXP '[0-9]'"));
         }
     }
 }

@@ -81,13 +81,24 @@
                                         </div>
                                         <div class="small text-muted">Driver: @(commission.Booking?.Ride?.Driver?.FullName ?? "Unknown")</div>
                                     </td>
-                                    <td class="fw-bold text-success">+₹@commission.PlatformFee.ToString("N2")</td>
+                                    <td class="@(commission.PlatformFee < 0 ? "fw-bold text-danger" : "fw-bold text-success")">
+                                        @(commission.PlatformFee < 0 ? "-" : "+")₹@Math.Abs(commission.PlatformFee).ToString("N2")
+                                    </td>
                                     <td>@commission.Percentage.ToString("0.##")%</td>
                                     <td>@(commission.Booking?.BookingTime.ToString("MMM dd, yyyy HH:mm") ?? "N/A")</td>
                                     <td class="pe-4">
-                                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill border border-0">
-                                            Credited
-                                        </span>
+                                        @if (commission.PlatformFee < 0)
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill border border-0">
+                                                Deducted
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success-subtle text-success-emphasis rounded-pill border border-0">
+                                                Credited
+                                            </span>
+                                        }
                                     </td>
                                     <td class="pe-4">
                                         <a asp-action="CommissionDetails" asp-route-id="@commission.Id" class="btn btn-sm btn-outline-primary">View</a>

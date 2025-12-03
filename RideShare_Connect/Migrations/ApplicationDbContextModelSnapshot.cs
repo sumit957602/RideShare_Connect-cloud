@@ -1010,7 +1010,10 @@ namespace RideShare_Connect.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserProfiles");
+                    b.ToTable("UserProfiles", t =>
+                        {
+                            t.HasCheckConstraint("CK_UserProfile_FullName_NoNumbers", "`FullName` NOT REGEXP '[0-9]'");
+                        });
                 });
 
             modelBuilder.Entity("RideShare_Connect.Models.UserManagement.UserRating", b =>

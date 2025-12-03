@@ -62,10 +62,21 @@
                 <div class="card-body">
                     <div class="mb-4 text-center">
                         <p class="text-muted mb-1">Platform Fee</p>
-                        <h2 class="display-6 fw-bold text-success">+₹@Model.PlatformFee.ToString("N2")</h2>
-                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill border border-0 px-3 py-2">
-                            Credited
-                        </span>
+                        <h2 class="display-6 fw-bold @(Model.PlatformFee < 0 ? "text-danger" : "text-success")">
+                            @(Model.PlatformFee < 0 ? "-" : "+")₹@Math.Abs(Model.PlatformFee).ToString("N2")
+                        </h2>
+                        @if (Model.PlatformFee < 0)
+                        {
+                            <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill border border-0 px-3 py-2">
+                                Deducted
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success-subtle text-success-emphasis rounded-pill border border-0 px-3 py-2">
+                                Credited
+                            </span>
+                        }
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
@@ -78,7 +89,14 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">Status</span>
-                            <span class="fw-medium text-success">Paid Out</span>
+                            @if (Model.PlatformFee < 0)
+                            {
+                                <span class="fw-medium text-danger">Refund Deduction</span>
+                            }
+                            else
+                            {
+                                <span class="fw-medium text-success">Paid Out</span>
+                            }
                         </li>
                     </ul>
                 </div>
