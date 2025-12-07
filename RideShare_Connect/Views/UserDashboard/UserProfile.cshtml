@@ -5,7 +5,7 @@
 }
 
 <head>
-    <link rel="stylesheet" href="~/css/userprofile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/user.css" asp-append-version="true" />
 </head>
 
 <body>
@@ -53,7 +53,7 @@
         <div class="row">
             <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
-                    <ul class="nav flex-column" id="sidebar-nav" role="tablist">
+                    <ul class="nav flex-column" id="sidebar-nav">
                         <li class="nav-item">
                             <a class="nav-link" href="../UserDashboard/User">
                                 <i class="bi bi-speedometer2"></i>Dashboard
@@ -66,7 +66,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-action="PrivacySettings" asp-controller="UserDashboard">
-                                <i class="bi bi-person-circle"></i>Privacy Settings
+                                <i class="bi bi-shield-lock"></i>Privacy Settings
                             </a>
                         </li>
                         <li class="nav-item mt-3">
@@ -76,7 +76,7 @@
                         </li>
                         <li class="nav-item">
                             <form asp-controller="UserAccount" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="nav-link btn btn-link p-0">
+                                <button type="submit" class="nav-link btn btn-link p-0 w-100 text-start">
                                     <i class="bi bi-box-arrow-left"></i>Logout
                                 </button>
                             </form>
@@ -86,49 +86,78 @@
             </nav>
 
             <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">User Profile</h1>
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                    <h1 class="h2">My Profile</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                             <span class="text-muted align-self-center">Manage your personal information</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="card p-4">
-                            <div class="card-body text-center">
-                                <div class="profile-img-container mb-4">
-                                    <img src="@Model.ProfilePicture" alt="User Profile Picture">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card stat-card animate-fade-up border-0 shadow-lg">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-5">
+                                    <div class="profile-img-container">
+                                        <img src="@Model.ProfilePicture" alt="@Model.FullName" onerror="this.src='/images/default-avatar.png'">
+                                    </div>
+                                    <h3 class="fw-bold text-dark">@Model.FullName</h3>
+                                    <p class="text-muted">Rider</p>
                                 </div>
-                                <h3 class="mb-1">@Model.FullName</h3>
 
                                 <form asp-action="UserProfile" method="post">
-                                    <div asp-validation-summary="All" class="text-danger"></div>
-                                    <div class="row g-3">
-                                        <div class="col-md-11 form-group-label-left">
-                                            <label asp-for="FullName" class="form-label"></label>
-                                            <input asp-for="FullName" class="form-control" id="fullName" required />
-                                            <span asp-validation-for="FullName" class="text-danger"></span>
+                                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-md-6 form-group-label-left">
+                                            <label asp-for="FullName" class="form-label">Full Name</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                                <input asp-for="FullName" class="form-control" placeholder="Your Name" required />
+                                            </div>
+                                            <span asp-validation-for="FullName" class="text-danger small"></span>
                                         </div>
-                                        <div class="col-md-11 form-group-label-left">
-                                            <label asp-for="ProfilePicture" class="form-label"></label>
-                                            <input asp-for="ProfilePicture" class="form-control" id="profilePicture" placeholder="URL to your profile image" />
-                                            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                                        
+                                        <div class="col-md-6 form-group-label-left">
+                                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                                                <input asp-for="PhoneNumber" class="form-control" placeholder="+91..." />
+                                            </div>
+                                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                                         </div>
-                                        <div class="col-md-11 form-group-label-left">
-                                            <label asp-for="EmergencyContact" class="form-label"></label>
-                                            <input asp-for="EmergencyContact" class="form-control" id="emergencyContact" />
-                                            <span asp-validation-for="EmergencyContact" class="text-danger"></span>
+
+                                        <div class="col-12 form-group-label-left">
+                                            <label asp-for="ProfilePicture" class="form-label">Profile Picture URL</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
+                                                <input asp-for="ProfilePicture" class="form-control" placeholder="https://example.com/my-photo.jpg" />
+                                            </div>
+                                            <div class="form-text">Paste a direct link to an image to update your avatar.</div>
+                                            <span asp-validation-for="ProfilePicture" class="text-danger small"></span>
                                         </div>
-                                        <div class="col-md-11 form-group-label-left">
-                                            <label asp-for="PhoneNumber" class="form-label"></label>
-                                            <input asp-for="PhoneNumber" class="form-control" id="phoneNumber" />
-                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
+                                        <div class="col-12 form-group-label-left">
+                                            <label asp-for="EmergencyContact" class="form-label">Emergency Contact</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light"><i class="bi bi-people"></i></span>
+                                                <input asp-for="EmergencyContact" class="form-control" placeholder="Name and Phone of emergency contact" />
+                                            </div>
+                                            <span asp-validation-for="EmergencyContact" class="text-danger small"></span>
                                         </div>
-                                        <div class="col-11 form-group-label-left">
-                                            <label asp-for="Bio" class="form-label"></label>
-                                            <textarea asp-for="Bio" class="form-control" id="bio" rows="3"></textarea>
-                                            <span asp-validation-for="Bio" class="text-danger"></span>
+
+                                        <div class="col-12 form-group-label-left">
+                                            <label asp-for="Bio" class="form-label">Bio</label>
+                                            <textarea asp-for="Bio" class="form-control" rows="3" placeholder="Tell us a bit about yourself..."></textarea>
+                                            <span asp-validation-for="Bio" class="text-danger small"></span>
                                         </div>
-                                        <div class="col-7 text-end">
-                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+
+                                        <div class="col-12 text-end mt-4">
+                                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow-sm">
+                                                <i class="bi bi-check-lg me-2"></i>Save Changes
+                                            </button>
                                         </div>
                                     </div>
                                 </form>

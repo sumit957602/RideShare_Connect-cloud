@@ -5,12 +5,12 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr>
-                    <th class="ps-4 py-3">Transaction ID</th>
-                    <th class="py-3">Date & Time</th>
-                    <th class="py-3">Status</th>
-                    <th class="py-3">Amount</th>
-                    <th class="pe-4 py-3">Description</th>
-                    <th class="py-3">Action</th>
+                    <th class="ps-4 py-3 text-secondary text-uppercase small ls-1">Transaction ID</th>
+                    <th class="py-3 text-secondary text-uppercase small ls-1">Date & Time</th>
+                    <th class="py-3 text-secondary text-uppercase small ls-1">Status</th>
+                    <th class="py-3 text-secondary text-uppercase small ls-1">Amount</th>
+                    <th class="pe-4 py-3 text-secondary text-uppercase small ls-1">Description</th>
+                    <th class="py-3 text-secondary text-uppercase small ls-1">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,10 +22,10 @@
                         var isSuccessful = txn.Status?.ToLower() == "successful";
                         var statusClass = txn.Status?.ToLower() switch
                         {
-                            "successful" => "bg-success-subtle text-success",
-                            "failed" => "bg-danger-subtle text-danger",
-                            "pending" => "bg-warning-subtle text-warning-emphasis",
-                            _ => "bg-secondary-subtle text-secondary"
+                            "successful" => "bg-success-subtle text-success border-success-subtle",
+                            "failed" => "bg-danger-subtle text-danger border-danger-subtle",
+                            "pending" => "bg-warning-subtle text-warning-emphasis border-warning-subtle",
+                            _ => "bg-secondary-subtle text-secondary border-secondary-subtle"
                         };
 
                         <tr>
@@ -39,7 +39,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="badge rounded-pill @statusClass border border-0">
+                                <span class="badge rounded-pill @statusClass border px-3 py-2 fw-medium">
                                     @if(isSuccessful) { <i class="bi bi-check-circle me-1"></i> }
                                     else if(txn.Status?.ToLower() == "failed") { <i class="bi bi-x-circle me-1"></i> }
                                     else { <i class="bi bi-hourglass-split me-1"></i> }
@@ -54,7 +54,7 @@
                                             <i class="bi @(isCredit ? "bi-arrow-down-left" : "bi-arrow-up-right")"></i>
                                         </div>
                                         <span class="fw-bold @(isCredit ? "text-success" : "text-danger")">
-                                            @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("F2")
+                                            @(isCredit ? "+" : "-")@Html.Raw("&#8377;")@txn.Amount.ToString("N2")
                                         </span>
                                     }
                                     else
@@ -63,16 +63,16 @@
                                             <i class="bi bi-dash"></i>
                                         </div>
                                         <span class="fw-bold text-muted">
-                                            @Html.Raw("&#8377;")@txn.Amount.ToString("F2")
+                                            @Html.Raw("&#8377;")@txn.Amount.ToString("N2")
                                         </span>
                                     }
                                 </div>
                             </td>
-                            <td class="pe-4 text-muted">
+                            <td class="pe-4 text-dark fw-medium">
                                 @txn.Description
                             </td>
                             <td>
-                                <a href="@Url.Action("TransactionDetails", "FinancialDashboard", new { id = txn.Id })" class="btn btn-sm btn-outline-primary">View</a>
+                                <a href="@Url.Action("TransactionDetails", "FinancialDashboard", new { id = txn.Id })" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
                             </td>
                         </tr>
                     }
@@ -80,8 +80,8 @@
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center py-5">
-                            <div class="text-muted">
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted opacity-50">
                                 <i class="bi bi-receipt display-4 mb-3 d-block"></i>
                                 <p class="mb-0">No transactions found.</p>
                             </div>
@@ -94,20 +94,20 @@
 
     @if (Model.TotalPages > 1)
     {
-        <div class="card-footer bg-white py-3">
+        <div class="card-footer bg-white py-3 border-top-0">
             <nav aria-label="Transaction history pagination">
                 <ul class="pagination justify-content-center mb-0">
                     <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                        <a class="page-link ajax-pagination-link" href="@Url.Action("GetTransactionHistory", new { page = Model.CurrentPage - 1 })" data-page="@(Model.CurrentPage - 1)">Previous</a>
+                        <a class="page-link ajax-pagination-link rounded-pill px-3 me-1 border-0" href="@Url.Action("GetTransactionHistory", new { page = Model.CurrentPage - 1 })" data-page="@(Model.CurrentPage - 1)">Previous</a>
                     </li>
                     @for (int i = 1; i <= Model.TotalPages; i++)
                     {
                         <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
-                            <a class="page-link ajax-pagination-link" href="@Url.Action("GetTransactionHistory", new { page = i })" data-page="@i">@i</a>
+                            <a class="page-link ajax-pagination-link rounded-circle d-flex align-items-center justify-content-center mx-1 border-0 @(Model.CurrentPage == i ? "shadow-sm" : "")" style="width: 36px; height: 36px;" href="@Url.Action("GetTransactionHistory", new { page = i })" data-page="@i">@i</a>
                         </li>
                     }
                     <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link ajax-pagination-link" href="@Url.Action("GetTransactionHistory", new { page = Model.CurrentPage + 1 })" data-page="@(Model.CurrentPage + 1)">Next</a>
+                        <a class="page-link ajax-pagination-link rounded-pill px-3 ms-1 border-0" href="@Url.Action("GetTransactionHistory", new { page = Model.CurrentPage + 1 })" data-page="@(Model.CurrentPage + 1)">Next</a>
                     </li>
                 </ul>
             </nav>
