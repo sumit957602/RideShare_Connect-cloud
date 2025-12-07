@@ -23,12 +23,24 @@ main {
     flex: 1;
 }
 
-/* --- Navbar Adjustment --- */
+/* --- Navbar Adjustment (Matched to User Dashboard) --- */
 .navbar {
     background-color: var(--dark-color);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.navbar .nav-link {
+    color: var(--text-light) !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover, .navbar .nav-link.active {
+    color: var(--secondary-color) !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--text-light) !important;
 }
 
 /* --- Navigation & Sidebar --- */
