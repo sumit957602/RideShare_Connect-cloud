@@ -42,73 +42,86 @@
         <section class="signup-section">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-7 col-xl-6">
+                    <div class="col-xl-10 col-lg-12">
                         <div class="signup-card">
-                            <div class="signup-card-header text-center">
-                                <h2 class="mb-0">Create Your Account</h2>
-                                <p class="mb-0">Join our community of trusted riders and drivers.</p>
+                            <div class="signup-image-col animate-fade-left">
+                                <div class="signup-image-overlay">
+                                    <h2>Start Your Journey Here.</h2>
+                                    <p class="lead">Join thousands of riders saving money and the planet every day.</p>
+                                </div>
                             </div>
-                            <div class="signup-card-body">
-                                <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="signup-form-col animate-fade-right">
+                                <div class="signup-card-header">
+                                    <h2>Create Account</h2>
+                                    <p class="text-muted">Fill in your details to get started.</p>
+                                </div>
+
+                                <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                                 <form asp-action="Register" method="post" id="registerForm">
-                                    <!-- Full Name -->
-                                    <div class="mb-3">
-                                        <label for="fullName" class="form-label">Full Name</label>
-                                        <input type="text" asp-for="FullName" class="form-control" id="fullName" placeholder="John Doe" required />
-                                    </div>
-                                    <!-- Email Address -->
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">Email Address</label>
-                                        <input type="email" asp-for="Email" class="form-control" id="email" placeholder="you@example.com" required />
-                                    </div>
-                                    <!-- Password -->
-                                    <div class="mb-3">
-                                        <label for="password" class="form-label">Password</label>
-                                        <input type="password" asp-for="Password" class="form-control" id="password" placeholder="••••••••" />
-                                        <span asp-validation-for="Password" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Secret Key -->
-                                    <div class="mb-3">
-                                        <label for="secretKey" class="form-label">Secret Key</label>
-                                        <input type="text" asp-for="SecretKey" class="form-control" id="secretKey" placeholder="Enter a secret key" required />
-                                        <div class="form-text text-muted">
-                                            <i class="bi bi-info-circle me-1"></i>This key will be used to reset your password if you forget it. Keep it safe!
+                                    <div class="row">
+                                        <!-- Full Name -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="fullName" class="form-label">Full Name</label>
+                                            <input type="text" asp-for="FullName" class="form-control" id="fullName" placeholder="John Doe" required />
                                         </div>
-                                        <span asp-validation-for="SecretKey" class="text-danger"></span>
+                                        <!-- Email Address -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" asp-for="Email" class="form-control" id="email" placeholder="name@example.com" required />
+                                        </div>
+                                        <!-- Password -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password" class="form-label">Password</label>
+                                            <input type="password" asp-for="Password" class="form-control" id="password" placeholder="••••••••" />
+                                            <span asp-validation-for="Password" class="text-danger small"></span>
+                                        </div>
+                                        <!-- Confirm Password -->
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="ConfirmPassword" class="form-label">Confirm</label>
+                                            <input asp-for="ConfirmPassword" class="form-control" type="password" id="confirmPassword" placeholder="••••••••" />
+                                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                        </div>
+
+                                        <!-- Secret Key -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="secretKey" class="form-label">Secret Key</label>
+                                            <input type="text" asp-for="SecretKey" class="form-control" id="secretKey" placeholder="Enter a secret key" required />
+                                            <div class="form-text text-muted small mt-1">
+                                                <i class="bi bi-info-circle me-1"></i>This key will be used to reset your password if you forget it. Keep it safe!
+                                            </div>
+                                            <span asp-validation-for="SecretKey" class="text-danger small"></span>
+                                        </div>
+
+                                        <!-- Phone Number -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel" asp-for="PhoneNumber" class="form-control" id="phone" placeholder="+91 9876543210" required />
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" asp-for="UserType" value="Rider" />
+
+                                    <!-- Terms and Conditions -->
+                                    <div class="form-check mb-4">
+                                        <input class="form-check-input" type="checkbox" asp-for="TermsAccepted" id="termsCheck" />
+                                        <label class="form-check-label text-muted small" for="termsCheck">
+                                            I agree to the <a asp-controller="Home" asp-action="Terms" target="_blank" class="text-decoration-none">Terms and Conditions</a>
+                                        </label>
+                                        <span asp-validation-for="TermsAccepted" class="text-danger d-block small"></span>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                                        <input asp-for="ConfirmPassword" class="form-control" type="password" id="confirmPassword" placeholder="••••••••" />
-                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                                    </div>
-                                    <!-- Phone Number -->
-                                    <div class="mb-3">
-                                        <label for="phone" class="form-label">Phone Number</label>
-                                        <input type="tel" asp-for="PhoneNumber" class="form-control" id="phone" placeholder="e.g., +91 9876543210" required />
-                                    </div>
-                                    <input type="hidden" asp-for="UserType" value="Rider" />
-                                    <!-- Terms and Conditions -->
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" asp-for="TermsAccepted" id="termsCheck" />
-                                        <label class="form-check-label" for="termsCheck">
-                                            I agree to the <a asp-controller="Home" asp-action="Terms" target="_blank">Terms and Conditions</a>
-                                        </label>
-                                        <span asp-validation-for="TermsAccepted" class="text-danger d-block"></span>
-                                    </div>
-                                    <div class="d-grid">
+                                    <div class="d-grid mb-3">
                                         <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
                                     </div>
                                 </form>
 
                                 <div class="divider-text"><span>OR</span></div>
                                 <div class="d-grid gap-2">
-                                    <button type="button" class="btn btn-outline-dark" onclick="googleSignIn()"><i class="bi bi-google me-2"></i>Log in with Google</button>
+                                    <button type="button" class="btn btn-outline-dark" onclick="googleSignIn()"><i class="bi bi-google me-2"></i>Sign up with Google</button>
                                 </div>
                                 <div class="text-center mt-4">
-                                    <p class="text-muted">Already have an account? <a href="Login">Log In</a></p>
+                                    <p class="text-muted small">Already have an account? <a href="Login" class="fw-bold text-decoration-none" style="color: var(--primary-color);">Log In</a></p>
                                 </div>
                             </div>
                         </div>

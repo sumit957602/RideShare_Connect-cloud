@@ -42,38 +42,46 @@
         <section class="login-section">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="col-xl-10 col-lg-12">
                         <div class="login-card">
-                            <div class="login-card-header text-center">
-                                <h2 class="mb-0">Welcome Back!</h2>
-                                <p class="mb-0">Log in to continue your journey.</p>
+                            <div class="login-image-col animate-fade-left">
+                                <div class="login-image-overlay">
+                                    <h2>Welcome Back.</h2>
+                                    <p class="lead">Ready for your next journey? Log in to connect.</p>
+                                </div>
                             </div>
-                            <div class="login-card-body">
+                            <div class="login-form-col animate-fade-right">
+                                <div class="login-card-header">
+                                    <h2>Login</h2>
+                                    <p class="text-muted">Enter your credentials to access your account.</p>
+                                </div>
+
                                 @if (TempData["SuccessMessage"] != null)
                                 {
                                     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
                                 }
                                 <form asp-action="Login" id="loginForm">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                                     <!-- Email Address -->
                                     <div class="mb-3">
                                         <label for="email" asp-for="Email" class="form-label">Email Address</label>
                                         <input type="email" asp-for="Email" class="form-control" id="email" placeholder="you@example.com" required />
-                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
                                     </div>
                                     <!-- Password -->
                                     <div class="mb-3">
                                         <label for="password" asp-for="Password" class="form-label">Password</label>
                                         <input type="password" asp-for="Password" class="form-control" id="password" placeholder="••••••••" />
-                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                        <span asp-validation-for="Password" class="text-danger small"></span>
                                     </div>
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
                                         <div class="form-check">
                                             <input class="form-check-input" asp-for="RememberMe" id="rememberMe" />
-                                            <label class="form-check-label" asp-for="RememberMe">Remember me</label>
+                                            <label class="form-check-label small" asp-for="RememberMe">Remember me</label>
                                         </div>
+                                        <a asp-action="ForgotPassword" class="text-decoration-none small" style="color: var(--primary-color);">Forgot Password?</a>
                                     </div>
-                                    <div class="d-grid">
+                                    <div class="d-grid mb-3">
                                         <button type="submit" class="btn btn-primary btn-lg">Log In</button>
                                     </div>
                                 </form>
@@ -83,8 +91,7 @@
                                     <button type="button" class="btn btn-outline-dark" onclick="googleSignIn()"><i class="bi bi-google me-2"></i>Log in with Google</button>
                                 </div>
                                 <div class="text-center mt-4">
-                                    <p><a asp-action="ForgotPassword">Forgot Password?</a></p>
-                                    <p class="text-muted">Don't have an account? <a asp-action="Register">Sign Up</a></p>
+                                    <p class="text-muted small">Don't have an account? <a asp-action="Register" class="fw-bold text-decoration-none" style="color: var(--primary-color);">Sign Up</a></p>
                                 </div>
                             </div>
                         </div>
