@@ -11,25 +11,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ride Details - RideShare Connect</title>
 
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-   
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    
+    <!-- Leaflet CSS for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-    <link rel="stylesheet" href="~/css/driverViewRide.css" asp-append-version="true" />
+    <!-- Use driver.css for consistent premium styling -->
+    <link rel="stylesheet" href="~/css/driver.css" asp-append-version="true" />
 
 </head>
 <body>
 
-   
+    <!-- Navbar (Unchanged) -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand fs-4" href="index.html">
@@ -65,98 +62,115 @@
         </div>
     </nav>
 
-    <!-- Main Content: Create Ride Form -->
+    <!-- Main Content -->
     <main class="flex-grow-1 py-5">
         <div class="container">
-            <div class="card">
-                <div class="form-card-header text-center">
-                    <h2 class="mb-0">Ride Details</h2>
-                    <p class="mb-0">View the ride information below.</p>
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Driver Menu</h5>
+                            <div class="nav flex-column nav-pills">
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-overview"><i class="bi bi-speedometer2 me-2"></i>Overview</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-profile"><i class="bi bi-person-badge-fill me-2"></i>Driver Profile</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-vehicles"><i class="bi bi-car-front-fill me-2"></i>My Vehicles</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-createdrides"><i class="bi bi-list-ul me-2"></i>Created Rides</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-acceptedrides"><i class="bi bi-check-circle-fill me-2"></i>Accepted Rides</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-activerides"><i class="bi bi-play-circle-fill me-2"></i>Active Rides</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-cancelledrides"><i class="bi bi-x-circle-fill me-2"></i>Cancelled Rides</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-totalrides"><i class="bi bi-collection me-2"></i>Total Rides</a>
+                                <a class="nav-link text-start" href="@Url.Action("Driver", "DriverDashboard")#v-pills-ratings"><i class="bi bi-star-fill me-2"></i>Ratings & Reviews</a>
+                                <div class="p-3 mt-4">
+                                    <a class="btn btn-primary w-100" asp-action="CreateRide">
+                                        <i class="bi bi-plus-circle-fill me-2"></i>Create a New Ride
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-4 p-md-5">
-                    <div class="row g-5">
-                        <!-- Form Fields -->
-                        <div class="col-lg-6">
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <label asp-for="Origin" class="form-label"></label>
-                                        <input asp-for="Origin" class="form-control" id="originInput" placeholder="Starting point" readonly />
-                                        <span asp-validation-for="Origin" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label asp-for="Destination" class="form-label"></label>
-                                        <input asp-for="Destination" class="form-control" id="destinationInput" placeholder="Ending point" readonly />
-                                        <span asp-validation-for="Destination" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-12">
-                                        <label asp-for="DistanceKm" class="form-label">Distance (km)</label>
-                                        <input asp-for="DistanceKm" class="form-control" id="distanceInput" placeholder="e.g., 10" readonly />
-                                        <span asp-validation-for="DistanceKm" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label" for="modalWaypoints">Waypoints (Optional)</label>
-                                        <input type="text" class="form-control" id="modalWaypoints" placeholder="e.g., Gandhi Maidan, Eco Park" readonly>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label asp-for="DepartureDate" class="form-label"></label>
-                                        <input asp-for="DepartureDate" class="form-control" id="modalDate" readonly />
-                                        <span asp-validation-for="DepartureDate" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label asp-for="DepartureTime" class="form-label"></label>
-                                        <input asp-for="DepartureTime" class="form-control" id="modalTime" readonly />
-                                        <span asp-validation-for="DepartureTime" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label asp-for="Seats" class="form-label">Available Seats</label>
-                                        <input asp-for="Seats" class="form-control" id="modalSeats" min="1" max="6" placeholder="e.g., 3" readonly />
-                                        <span asp-validation-for="Seats" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label asp-for="PricePerSeat" class="form-label"></label>
-                                        <input asp-for="PricePerSeat" class="form-control" id="modalPrice" placeholder="e.g., 100" readonly />
-                                        <span asp-validation-for="PricePerSeat" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label asp-for="VehicleId" class="form-label"></label>
-                                        <select asp-for="VehicleId" class="form-select" asp-items="@(new SelectList(Model.Vehicles, "Id", "LicensePlate"))" disabled>
-                                            <option value="">Choose...</option>
-                                        </select>
-                                        <span asp-validation-for="VehicleId" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-check">
-                                            <input asp-for="IsRecurring" class="form-check-input" id="isRecurring" disabled />
-                                            <label class="form-check-label" for="isRecurring">This is a recurring ride</label>
+
+                <!-- Main Content Area -->
+                <div class="col-lg-9">
+                    <div class="card">
+                        <div class="card-header text-center bg-transparent border-0 pt-4">
+                            <h2 class="mb-0">Ride Details</h2>
+                            <p class="text-muted mb-0">View the ride information below.</p>
+                        </div>
+                        <div class="card-body p-4 p-md-5">
+                            <div class="row g-5">
+                                <!-- Form Fields -->
+                                <div class="col-lg-6">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label asp-for="Origin" class="form-label"></label>
+                                            <input asp-for="Origin" class="form-control" id="originInput" placeholder="Starting point" readonly />
+                                            <span asp-validation-for="Origin" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label asp-for="Destination" class="form-label"></label>
+                                            <input asp-for="Destination" class="form-control" id="destinationInput" placeholder="Ending point" readonly />
+                                            <span asp-validation-for="Destination" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-12">
+                                            <label asp-for="DistanceKm" class="form-label">Distance (km)</label>
+                                            <input asp-for="DistanceKm" class="form-control" id="distanceInput" placeholder="e.g., 10" readonly />
+                                            <span asp-validation-for="DistanceKm" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label" for="modalWaypoints">Waypoints (Optional)</label>
+                                            <input type="text" class="form-control" id="modalWaypoints" placeholder="e.g., Gandhi Maidan, Eco Park" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label asp-for="DepartureDate" class="form-label"></label>
+                                            <input asp-for="DepartureDate" class="form-control" id="modalDate" readonly />
+                                            <span asp-validation-for="DepartureDate" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label asp-for="DepartureTime" class="form-label"></label>
+                                            <input asp-for="DepartureTime" class="form-control" id="modalTime" readonly />
+                                            <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="Seats" class="form-label">Available Seats</label>
+                                            <input asp-for="Seats" class="form-control" id="modalSeats" min="1" max="6" placeholder="e.g., 3" readonly />
+                                            <span asp-validation-for="Seats" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="PricePerSeat" class="form-label"></label>
+                                            <input asp-for="PricePerSeat" class="form-control" id="modalPrice" placeholder="e.g., 100" readonly />
+                                            <span asp-validation-for="PricePerSeat" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label asp-for="VehicleId" class="form-label"></label>
+                                            <select asp-for="VehicleId" class="form-select" asp-items="@(new SelectList(Model.Vehicles, "Id", "LicensePlate"))" disabled>
+                                                <option value="">Choose...</option>
+                                            </select>
+                                            <span asp-validation-for="VehicleId" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input asp-for="IsRecurring" class="form-check-input" id="isRecurring" disabled />
+                                                <label class="form-check-label" for="isRecurring">This is a recurring ride</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 text-end mt-5">
+                                            <a asp-action="Driver" class="btn btn-secondary">Back</a>
                                         </div>
                                     </div>
-                                    <div class="col-12 text-end mt-5">
-                                        <a asp-action="Driver" class="btn btn-secondary">Back</a>
-                                    </div>
                                 </div>
-                        </div>
-                        <!-- Map -->
-                        <div class="col-lg-6">
-                            <div id="map"></div>
+                                <!-- Map -->
+                                <div class="col-lg-6">
+                                    <div id="map" style="height: 500px; width: 100%; border-radius: 12px;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- Footer from Main Site -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4"><h5><i class="bi bi-car-front-fill me-2" style="color: var(--secondary-color);"></i>RideShare Connect</h5><p>Your trusted platform for safe, comfortable, and affordable shared rides.</p></div>
-                <div class="col-lg-2 col-md-4 col-6"><h5>Quick Links</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">About Us</a></li><li class="mb-2"><a href="#">Contact</a></li></ul></div>
-                <div class="col-lg-3 col-md-4 col-6"><h5>Legal</h5><ul class="list-unstyled"><li class="mb-2"><a href="#">Privacy Policy</a></li><li class="mb-2"><a href="#">Terms of Service</a></li></ul></div>
-                <div class="col-lg-3 col-md-4"><h5>Contact Us</h5><ul class="list-unstyled"><li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> 123 Connect Ave, Patna</li><li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contact@rideshareconnect.com</li></ul></div>
-            </div>
-            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);"><div class="text-center"><p>&copy; 2025 RideShare Connect. All Rights Reserved.</p></div>
-        </div>
-    </footer>
 
     <!-- Leaflet JS for Map -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -253,7 +267,7 @@
             originInput.addEventListener('change', updateMap);
             destinationInput.addEventListener('change', updateMap);
 
-            updateMap();
+            updateMap(); // Initial call
         });
     </script>
 

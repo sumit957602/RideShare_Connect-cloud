@@ -5,7 +5,10 @@
     --light-color: #f8f9fa;
     --text-dark: #333;
     --text-light: #fff;
-    --body-bg: #f1f5f9;
+    --body-bg: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.18);
+    --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 body {
@@ -20,15 +23,10 @@ main {
     flex: 1;
 }
 
-/* --- Main Site Navbar & Footer Styles --- */
+/* --- Navbar Adjustment (Matched to User Dashboard) --- */
 .navbar {
     background-color: var(--dark-color);
-    padding: 1rem 0;
-}
-
-.navbar-brand {
-    font-weight: 700;
-    color: var(--text-light) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
 }
 
 .navbar .nav-link {
@@ -36,60 +34,112 @@ main {
     font-weight: 500;
 }
 
-    .navbar .nav-link:hover, .navbar .nav-link.active {
-        color: var(--secondary-color) !important;
-    }
-
-.btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+.navbar .nav-link:hover, .navbar .nav-link.active {
+    color: var(--secondary-color) !important;
 }
 
-    .btn-primary:hover {
-        background-color: #e65c00;
-        border-color: #e65c00;
-    }
-
-.footer {
-    background-color: var(--dark-color);
-    color: rgba(255, 255, 255, 0.7);
-    padding-top: 4rem;
-    padding-bottom: 2rem;
-    margin-top: auto;
+.navbar-brand {
+    font-weight: 700;
+    color: var(--text-light) !important;
 }
 
-    .footer h5 {
-        color: var(--text-light);
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-    }
-
-    .footer a {
-        color: rgba(255, 255, 255, 0.7);
-        text-decoration: none;
-    }
-
-        .footer a:hover {
-            color: var(--text-light);
-        }
-
-/* --- Driver Dashboard Specific Styles --- */
-.card {
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    border: none;
-}
-
+/* --- Navigation & Sidebar --- */
 .nav-pills .nav-link {
-    color: var(--text-dark);
+    color: #6c757d;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
 }
 
-    .nav-pills .nav-link.active {
-        background-color: var(--primary-color);
-    }
+.nav-pills .nav-link i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
 
-.stat-card .icon {
-    font-size: 2rem;
-    padding: 1rem;
-    border-radius: 50%;
+.nav-pills .nav-link:hover {
+    background-color: rgba(255, 102, 0, 0.05);
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, var(--primary-color), #ff8533);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.3);
+}
+
+/* --- Cards & Containers --- */
+.card {
+    border: none;
+    background: var(--glass-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+}
+
+/* --- Stats Cards & Icons --- */
+.stat-card {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon, .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Utility classes for backgrounds if not using Bootstrap's *-subtle or if customized */
+.bg-orange-subtle { background-color: rgba(255, 102, 0, 0.1); color: var(--primary-color); }
+.bg-green-subtle { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+
+/* --- Buttons --- */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #ff8533);
+    border: none;
+    box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2);
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 102, 0, 0.3);
+    background: linear-gradient(135deg, #ff8533, var(--primary-color));
+}
+
+.btn-light {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    backdrop-filter: blur(5px);
+}
+
+.btn-light:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* Footer (explicitly adding hidden class just in case, but will remove from HTML) */
+.footer {
+    display: none;
 }
