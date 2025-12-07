@@ -38,94 +38,106 @@
         <section class="signup-section">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-7 col-xl-6">
+                    <div class="col-lg-10 col-xl-9">
                         <div class="signup-card">
-                            <div class="signup-card-header text-center">
-                                <h2 class="mb-0">Become a RideShare Connect Driver</h2>
-                                <p class="mb-0">Start earning on your own schedule.</p>
+                            <!-- Image Column -->
+                            <div class="signup-image-col animate-fade-left">
+                                <div class="signup-image-overlay">
+                                    <h2 class="display-5">Drive with Pride</h2>
+                                    <p class="lead mb-0">Join the community of trusted drivers and earn on your schedule.</p>
+                                </div>
                             </div>
-                            <div class="signup-card-body">
+                            
+                            <!-- Form Column -->
+                            <div class="signup-form-col animate-fade-right">
+                                <div class="signup-card-header text-center mb-4">
+                                    <h3 class="mb-0 text-white">Driver Registration</h3>
+                                    <p class="small text-white">Fill in your details to get started.</p>
+                                </div>
+
                                 <form asp-action="Register" asp-controller="DriverAccount">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <!-- Full Name -->
-                                    <div class="mb-3">
-                                        <label asp-for="FullName" class="form-label">Full Name</label>
-                                        <input asp-for="FullName" class="form-control" placeholder="John Doe" />
-                                        <span asp-validation-for="FullName" class="text-danger"></span>
+                                    
+                                    <div class="row g-3">
+                                        <!-- Full Name -->
+                                        <div class="col-md-6">
+                                            <label asp-for="FullName" class="form-label">Full Name</label>
+                                            <input asp-for="FullName" class="form-control" placeholder="John Doe" />
+                                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                                        </div>
+
+                                        <!-- Email Address -->
+                                        <div class="col-md-6">
+                                            <label asp-for="Email" class="form-label">Email Address</label>
+                                            <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                                            <span asp-validation-for="Email" class="text-danger small"></span>
+                                        </div>
+
+                                        <!-- Phone Number -->
+                                        <div class="col-md-6">
+                                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                            <input asp-for="PhoneNumber" class="form-control" placeholder="1234567890" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                        </div>
+
+                                        <!-- Password -->
+                                        <div class="col-md-6">
+                                            <label asp-for="Password" class="form-label">Password</label>
+                                            <input asp-for="Password" class="form-control" type="password" id="password" placeholder="••••••••" />
+                                            <span asp-validation-for="Password" class="text-danger small"></span>
+                                        </div>
+                                        
+                                        <!-- Confirm Password -->
+                                        <div class="col-md-6">
+                                            <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                                            <input asp-for="ConfirmPassword" class="form-control" type="password" id="confirmPassword" placeholder="••••••••" />
+                                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                        </div>
+
+                                        <!-- Driving Details -->
+                                        <div class="col-md-6">
+                                            <label asp-for="LicenseNumber" class="form-label">License Number</label>
+                                            <input asp-for="LicenseNumber" class="form-control" placeholder="DL142021..." />
+                                            <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label asp-for="DrivingExperienceYears" class="form-label">Experience (Years)</label>
+                                            <input asp-for="DrivingExperienceYears" class="form-control" type="number" min="0" />
+                                            <span asp-validation-for="DrivingExperienceYears" class="text-danger small"></span>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label asp-for="DOB" class="form-label">Date of Birth</label>
+                                            <input asp-for="DOB" class="form-control" type="date" />
+                                            <span asp-validation-for="DOB" class="text-danger small"></span>
+                                        </div>
                                     </div>
 
-                                    <!-- Email Address -->
-                                    <div class="mb-3">
-                                        <label asp-for="Email" class="form-label">Email Address</label>
-                                        <input asp-for="Email" class="form-control" placeholder="you@example.com" />
-                                        <span asp-validation-for="Email" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Phone Number -->
-                                    <div class="mb-3">
-                                        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
-                                        <input asp-for="PhoneNumber" class="form-control" placeholder="1234567890" />
-                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Password -->
-                                    <div class="mb-3">
-                                        <label asp-for="Password" class="form-label">Password</label>
-                                        <input asp-for="Password" class="form-control" type="password" id="password" placeholder="••••••••" />
-                                        <span asp-validation-for="Password" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-                                        <input asp-for="ConfirmPassword" class="form-control" type="password" id="confirmPassword" placeholder="••••••••" />
-                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- License Number -->
-                                    <div class="mb-3">
-                                        <label asp-for="LicenseNumber" class="form-label">Driving License Number</label>
-                                        <input asp-for="LicenseNumber" class="form-control" placeholder="e.g., DL1420210012345" />
-                                        <span asp-validation-for="LicenseNumber" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Driving Experience -->
-                                    <div class="mb-3">
-                                        <label asp-for="DrivingExperienceYears" class="form-label">Driving Experience (in years)</label>
-                                        <input asp-for="DrivingExperienceYears" class="form-control" type="number" min="0" />
-                                        <span asp-validation-for="DrivingExperienceYears" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Date of Birth -->
-                                    <div class="mb-3">
-                                        <label asp-for="DOB" class="form-label">Date of Birth</label>
-                                        <input asp-for="DOB" class="form-control" type="date" />
-                                        <span asp-validation-for="DOB" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Background Check Consent -->
-                                    <div class="form-check mb-3">
+                                    <!-- Consent & Terms -->
+                                    <div class="form-check mt-3">
                                         <input class="form-check-input" type="checkbox" value="" id="backgroundCheck" required>
-                                        <label class="form-check-label" for="backgroundCheck">
-                                            I consent to a background check as part of the driver verification process.
+                                        <label class="form-check-label small" for="backgroundCheck">
+                                            I consent to a background check.
                                         </label>
                                     </div>
 
-                                    <!-- Terms and Conditions -->
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="checkbox" value="" id="termsCheck" required>
-                                        <label class="form-check-label" for="termsCheck">
-                                            I agree to the <a asp-action="DriverTerms" asp-controller="Home" target="_blank">Driver Terms and Conditions</a>
+                                        <label class="form-check-label small" for="termsCheck">
+                                            I agree to the <a asp-action="DriverTerms" asp-controller="Home" target="_blank">Terms & Conditions</a>
                                         </label>
                                     </div>
 
                                     <!-- Submit Button -->
                                     <div class="d-grid mt-4">
-                                        <button type="submit" class="btn btn-primary btn-lg">Register as a Driver</button>
+                                        <button type="submit" class="btn btn-primary btn-lg fw-bold">Register as Driver</button>
+                                    </div>
+                                    
+                                    <div class="text-center mt-3">
+                                        <p class="text-muted small">Already registered? <a asp-action="Login" asp-controller="DriverAccount" class="fw-bold text-decoration-none">Log In</a></p>
                                     </div>
                                 </form>
-                                <div class="text-center mt-4">
-                                    <p class="text-muted">Already have an account? <a asp-action="Login" asp-controller="DriverAccount">Log In</a></p>
-                                </div>
                             </div>
                         </div>
                     </div>

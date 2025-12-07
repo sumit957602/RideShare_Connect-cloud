@@ -35,51 +35,62 @@
         <section class="login-section">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="col-lg-10 col-xl-9">
                         <div class="login-card">
-                            <div class="login-card-header text-center">
-                                <h2 class="mb-0">Driver Login</h2>
-                                <p class="mb-0">Welcome back! Log in to manage your rides.</p>
+                            <!-- Image Column -->
+                            <div class="login-image-col animate-fade-left">
+                                <div class="login-image-overlay">
+                                    <h2 class="display-5">Welcome Back</h2>
+                                    <p class="lead mb-0">Continue your journey with us.</p>
+                                </div>
                             </div>
-                            <div class="login-card-body">
-                                @if (TempData["SuccessMessage"] != null)
-                                {
-                                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-                                }
-                                <form asp-action="Login" asp-controller="DriverAccount">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <!-- Email Address -->
-                                    <div class="mb-3">
-                                        <label for="email" asp-for="Email" class="form-label">Email Address</label>
-                                        <input type="email" asp-for="Email" class="form-control" id="email" placeholder="you@example.com" required>
-                                        <span asp-validation-for="Email" class="text-danger"></span>
-                                    </div>
 
-                                    <!-- Password -->
-                                    <div class="mb-3">
-                                        <label for="password" asp-for="Password" class="form-label">Password</label>
-                                        <input type="password" asp-for="Password" class="form-control" id="password" placeholder="••••••••">
-                                        <span asp-validation-for="Password" class="text-danger"></span>
-                                    </div>
-
-                                    <!-- Remember Me & Forgot Password -->
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="rememberMe">
-                                            <label class="form-check-label" for="rememberMe">
-                                                Remember me
-                                            </label>
+                            <!-- Form Column -->
+                            <div class="login-form-col animate-fade-right">
+                                <div class="login-card-header text-center mb-4">
+                                    <h2 class="mb-0 text-white">Driver Login</h2>
+                                    <p class="mb-0 text-white">Log in to manage your rides.</p>
+                                </div>
+                                <div class="login-card-body p-0">
+                                    @if (TempData["SuccessMessage"] != null)
+                                    {
+                                        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                                    }
+                                    <form asp-action="Login" asp-controller="DriverAccount">
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                        <!-- Email Address -->
+                                        <div class="mb-3">
+                                            <label for="email" asp-for="Email" class="form-label">Email Address</label>
+                                            <input type="email" asp-for="Email" class="form-control" id="email" placeholder="you@example.com" required>
+                                            <span asp-validation-for="Email" class="text-danger"></span>
                                         </div>
-                                        <a asp-action="ForgotPassword" asp-controller="DriverAccount" class="form-text">Forgot password?</a>
-                                    </div>
 
-                                    <!-- Submit Button -->
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary btn-lg">Log In as Driver</button>
+                                        <!-- Password -->
+                                        <div class="mb-3">
+                                            <label for="password" asp-for="Password" class="form-label">Password</label>
+                                            <input type="password" asp-for="Password" class="form-control" id="password" placeholder="••••••••">
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+
+                                        <!-- Remember Me & Forgot Password -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                                                <label class="form-check-label" for="rememberMe">
+                                                    Remember me
+                                                </label>
+                                            </div>
+                                            <a asp-action="ForgotPassword" asp-controller="DriverAccount" class="form-text">Forgot password?</a>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary btn-lg fw-bold">Log In as Driver</button>
+                                        </div>
+                                    </form>
+                                    <div class="text-center mt-4">
+                                        <p class="text-muted">Need a driver account? <a asp-action="Register" asp-controller="DriverAccount">Register Here</a></p>
                                     </div>
-                                </form>
-                                <div class="text-center mt-4">
-                                    <p class="text-muted">Need a driver account? <a asp-action="Register" asp-controller="DriverAccount">Register Here</a></p>
                                 </div>
                             </div>
                         </div>
